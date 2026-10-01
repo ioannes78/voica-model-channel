@@ -1,9 +1,9 @@
 {
   "catalogVersion": 1,
-  "manifestVersion": 1,
+  "manifestVersion": 2,
   "channel": "production",
-  "publishedAt": "2026-10-01T00:00:00Z",
-  "manifestDigest": "6ae367fec7cc493ddf55ff8125cd15254f00aa02dc2a8a1398cb46ca7d427d40",
+  "publishedAt": "2026-10-01T18:08:39Z",
+  "manifestDigest": "91ed1d83ac8e1d7b1108dc56129d697da9d3890215bb344d304abc261330d79f",
   "signature": null,
   "keyId": null,
   "models": [
@@ -16,7 +16,9 @@
       "runtimeId": "sherpa-onnx",
       "runtimeVersionMin": "1.13.8",
       "runtimeVersionMax": null,
-      "languages": ["und"],
+      "languages": [
+        "und"
+      ],
       "capabilities": {
         "supportsStreaming": false,
         "supportsPartial": false,
@@ -40,7 +42,9 @@
         }
       ],
       "compatibility": {
-        "abis": ["arm64-v8a"],
+        "abis": [
+          "arm64-v8a"
+        ],
         "minSdk": 26,
         "appVersionMin": 20,
         "appVersionMax": null
@@ -55,6 +59,86 @@
       "homepage": "https://github.com/snakers4/silero-vad",
       "releaseChannel": "production",
       "autoUpdateEligible": true,
+      "deprecated": false,
+      "criticalUpdate": false
+    },
+    {
+      "modelId": "zipformer-small-bilingual",
+      "kind": "ASR_STREAMING",
+      "displayName": "Small Bilingual Zipformer zh-en",
+      "version": "2023-02-16",
+      "revision": 1,
+      "runtimeId": "sherpa-onnx",
+      "runtimeVersionMin": "1.13.8",
+      "runtimeVersionMax": null,
+      "languages": [
+        "zh",
+        "en"
+      ],
+      "capabilities": {
+        "supportsStreaming": true,
+        "supportsPartial": true,
+        "supportsTokenTiming": true,
+        "supportsLanguageDetection": false,
+        "supportsConfidence": false,
+        "supportsInverseTextNormalization": false,
+        "supportsSecondPass": false,
+        "supportsHotwords": false
+      },
+      "sourceType": "MANAGED_DOWNLOAD",
+      "builtinAssetPath": null,
+      "download": {
+        "packageFormat": "ZIP",
+        "url": "https://github.com/ioannes78/voica-model-channel/releases/download/candidate-small-bilingual-r1/zipformer-small-bilingual-2023-02-16-voica-r1.zip",
+        "mirrors": [],
+        "sizeBytes": 52405607,
+        "sha256": "8e75023f9929d7a5866c8b988f6a99be22ca450580cdf41aa1b6964450cb30e9"
+      },
+      "installedSizeBytes": 60142871,
+      "files": [
+        {
+          "relativePath": "encoder.int8.onnx",
+          "sizeBytes": 42980793,
+          "sha256": "db6f51551762e40e549166fe041ea3e45464370b595e9ad23f06478ec3794fbb",
+          "packagePath": "encoder.int8.onnx"
+        },
+        {
+          "relativePath": "decoder.onnx",
+          "sizeBytes": 13877276,
+          "sha256": "89be509a83175261695bdef5fd1c7b9ab1129a663d1284e7ba9f8507b21e0906",
+          "packagePath": "decoder.onnx"
+        },
+        {
+          "relativePath": "joiner.int8.onnx",
+          "sizeBytes": 3228485,
+          "sha256": "bdda356d6f9b8c2d7cee9ee0e26075fa537490f7fd06520be408d287073667b9",
+          "packagePath": "joiner.int8.onnx"
+        },
+        {
+          "relativePath": "tokens.txt",
+          "sizeBytes": 56317,
+          "sha256": "a8e0e4ec53810e433789b54a5c0134a7eaa2ffca595a6334d54c00da858841d3",
+          "packagePath": "tokens.txt"
+        }
+      ],
+      "compatibility": {
+        "abis": [
+          "arm64-v8a"
+        ],
+        "minSdk": 26,
+        "appVersionMin": 20,
+        "appVersionMax": null
+      },
+      "license": {
+        "id": "Apache-2.0",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/blob/master/LICENSE",
+        "attribution": "k2-fsa Small Bilingual Zipformer zh-en 2023-02-16",
+        "redistributionPolicy": "VOICA_MIRROR_ALLOWED"
+      },
+      "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16.tar.bz2",
+      "homepage": "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/online-transducer/zipformer-transducer-models.html",
+      "releaseChannel": "production",
+      "autoUpdateEligible": false,
       "deprecated": false,
       "criticalUpdate": false
     }
