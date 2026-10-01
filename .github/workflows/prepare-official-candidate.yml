@@ -27,6 +27,33 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Enforce Stage 8 candidate order
+        env:
+          MODEL: ${{ inputs.model }}
+        run: |
+          python3 - "$MODEL" manifests/production.json <<'PY'
+          import json
+          import sys
+
+          model = sys.argv[1]
+          with open(sys.argv[2], "r", encoding="utf-8") as f:
+              production = json.load(f)
+          present = {item["modelId"] for item in production["models"]}
+          required = {
+              "punctuation": {"zipformer-small-bilingual"},
+              "sensevoice": {
+                  "zipformer-small-bilingual",
+                  "ct-transformer-zh-en-int8",
+              },
+          }[model]
+          missing = sorted(required - present)
+          if missing:
+              raise SystemExit(
+                  "candidate order violation: merge/validate prerequisites first: "
+                  + ", ".join(missing)
+              )
+          PY
+
       - name: Verify official package and generate descriptor
         run: |
           python3 scripts/prepare-official-model.py             "${{ inputs.model }}"             "${{ inputs.revision }}"             dist
