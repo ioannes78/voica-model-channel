@@ -103,7 +103,14 @@ jobs:
           git commit -m "Candidate: ${MODEL} r${REVISION}" || true
           git push --force-with-lease origin "$branch"
           if ! gh pr view "$branch" >/dev/null 2>&1; then
-            gh pr create               --base main               --head "$branch"               --title "Candidate: ${MODEL} r${REVISION}"               --body "Do not merge until Voica Android has downloaded the candidate, passed package/file verification, native sherpa smoke activation, and the relevant real-device transcription acceptance."
+            if ! gh pr create \
+              --base main \
+              --head "$branch" \
+              --title "Candidate: ${MODEL} r${REVISION}" \
+              --body "Do not merge until Voica Android has downloaded the candidate, passed package/file verification, native sherpa smoke activation, and the relevant real-device transcription acceptance."; then
+              echo "::warning::GitHub Actions is not permitted to create pull requests. Candidate branch '$branch' is ready for a maintainer to open manually."
+              echo "Manual PR: https://github.com/${{ github.repository }}/compare/main...${branch}?expand=1"
+            fi
           fi
 
       - uses: actions/upload-artifact@v4
