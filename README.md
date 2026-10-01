@@ -43,13 +43,30 @@ arm64 CPU package; those assets target Rockchip acceleration.
 ## Candidate workflows
 
 - **Prepare Small Bilingual Candidate**: builds the generic Android CPU package
-  from the pinned upstream 2023-02-16 archive, publishes it only as a GitHub
-  prerelease, and opens a human-gated manifest PR.
+  from the pinned upstream 2023-02-16 archive, publishes the model ZIP plus the
+  candidate `production.json` as a GitHub prerelease, and opens a human-gated
+  manifest PR.
 - **Prepare Official Upstream Candidate**: verifies the pinned official package
-  SHA-256 for CT-Transformer punctuation or SenseVoice and opens a human-gated
-  manifest PR that points directly to the official upstream archive.
+  SHA-256 for CT-Transformer punctuation or SenseVoice, publishes the candidate
+  `production.json` as a GitHub prerelease, and opens a human-gated manifest PR
+  that still points the model download at the official upstream archive.
 - **Validate Production Manifest**: recomputes the models-array digest, checks
   HTTPS/hash/path invariants, and prevents removal/change of the APK Silero baseline.
 
 Merging a candidate PR is the publication action. Candidate generation alone never
 changes the App-visible production manifest.
+
+## Pre-merge Android validation
+
+A Debug Voica APK can temporarily use the candidate manifest release asset before
+the candidate PR is merged. The accepted URL shape is:
+
+`https://github.com/ioannes78/voica-model-channel/releases/download/<candidate-tag>/production.json`
+
+Use that URL only in the Debug-only Stage 8 candidate model control. After saving,
+fully exit and reopen Voica so its ModelManager is recreated from the candidate
+catalog. Download and activate the candidate, complete the native sherpa smoke test
+and the relevant transcription acceptance, then merge the manifest PR. Restore the
+Debug App to production afterward.
+
+Release builds do not accept this override and always use the production manifest.
