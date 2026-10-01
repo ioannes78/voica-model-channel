@@ -82,7 +82,14 @@ jobs:
           git commit -m "Candidate: Small Bilingual r${REVISION}" || true
           git push --force-with-lease origin "$branch"
           if ! gh pr view "$branch" >/dev/null 2>&1; then
-            gh pr create               --base main               --head "$branch"               --title "Candidate: Small Bilingual r${REVISION}"               --body "Stage 8 order: this is the first downloadable model. Do not merge until Voica Android has downloaded it and passed package/file verification plus the streaming-ASR native smoke activation. Full Fast transcription is intentionally deferred to the punctuation candidate, which is generated after this PR is merged."
+            if ! gh pr create \
+              --base main \
+              --head "$branch" \
+              --title "Candidate: Small Bilingual r${REVISION}" \
+              --body "Stage 8 order: this is the first downloadable model. Do not merge until Voica Android has downloaded it and passed package/file verification plus the streaming-ASR native smoke activation. Full Fast transcription is intentionally deferred to the punctuation candidate, which is generated after this PR is merged."; then
+              echo "::warning::GitHub Actions is not permitted to create pull requests. Candidate branch '$branch' is ready for a maintainer to open manually."
+              echo "Manual PR: https://github.com/${{ github.repository }}/compare/main...${branch}?expand=1"
+            fi
           fi
 
       - uses: actions/upload-artifact@v4
