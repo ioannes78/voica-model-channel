@@ -1,0 +1,83 @@
+name: Prepare Small Bilingual Candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      revision:
+        description: Voica model revision
+        required: true
+        default: "1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare candidate package
+        id: prepare
+        env:
+          REVISION: ${{ inputs.revision }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="candidate-small-bilingual-r${REVISION}"
+          package="zipformer-small-bilingual-2023-02-16-voica-r${REVISION}.zip"
+          url="https://github.com/${GH_REPO}/releases/download/${tag}/${package}"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "package=${package}" >> "$GITHUB_OUTPUT"
+          CANDIDATE_DOWNLOAD_URL="$url" bash scripts/prepare-small-bilingual.sh
+
+      - name: Publish/update prerelease candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.prepare.outputs.tag }}
+          PACKAGE: ${{ steps.prepare.outputs.package }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "dist/$PACKAGE" "dist/source-provenance.json" --clobber
+          else
+            gh release create "$TAG"               "dist/$PACKAGE" "dist/source-provenance.json"               --prerelease               --title "Candidate: Small Bilingual r${{ inputs.revision }}"               --notes "Candidate only. Do not merge the manifest PR until Android native smoke and transcription acceptance pass."
+          fi
+
+      - name: Generate candidate production manifest
+        run: |
+          python3 scripts/upsert_model.py             manifests/production.json             dist/model-descriptor.json             dist/production.json
+          python3 scripts/validate_manifest.py dist/production.json
+
+      - name: Open/update human-gated manifest PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVISION: ${{ inputs.revision }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="candidate/small-bilingual-r${REVISION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          cp dist/production.json manifests/production.json
+          git add manifests/production.json
+          git commit -m "Candidate: Small Bilingual r${REVISION}" || true
+          git push --force-with-lease origin "$branch"
+          if ! gh pr view "$branch" >/dev/null 2>&1; then
+            gh pr create               --base main               --head "$branch"               --title "Candidate: Small Bilingual r${REVISION}"               --body "Do not merge until Voica Android has downloaded this candidate, passed package/file verification, native sherpa smoke activation, and real-device Fast transcription acceptance."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: small-bilingual-candidate-r${{ inputs.revision }}
+          path: |
+            dist/model-descriptor.json
+            dist/source-provenance.json
+            dist/production.json
+          retention-days: 7

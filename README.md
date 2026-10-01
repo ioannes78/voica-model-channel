@@ -38,3 +38,18 @@ promoted.
 
 Do not use the RK356x/RK3576/RK3588 Small Bilingual packages as the generic Android
 arm64 CPU package; those assets target Rockchip acceleration.
+
+
+## Candidate workflows
+
+- **Prepare Small Bilingual Candidate**: builds the generic Android CPU package
+  from the pinned upstream 2023-02-16 archive, publishes it only as a GitHub
+  prerelease, and opens a human-gated manifest PR.
+- **Prepare Official Upstream Candidate**: verifies the pinned official package
+  SHA-256 for CT-Transformer punctuation or SenseVoice and opens a human-gated
+  manifest PR that points directly to the official upstream archive.
+- **Validate Production Manifest**: recomputes the models-array digest, checks
+  HTTPS/hash/path invariants, and prevents removal/change of the APK Silero baseline.
+
+Merging a candidate PR is the publication action. Candidate generation alone never
+changes the App-visible production manifest.

@@ -1,0 +1,65 @@
+name: Prepare Official Upstream Candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: Model
+        required: true
+        type: choice
+        options:
+          - punctuation
+          - sensevoice
+      revision:
+        description: Voica model revision
+        required: true
+        default: "1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify official package and generate descriptor
+        run: |
+          python3 scripts/prepare-official-model.py             "${{ inputs.model }}"             "${{ inputs.revision }}"             dist
+
+      - name: Generate candidate production manifest
+        run: |
+          python3 scripts/upsert_model.py             manifests/production.json             dist/model-descriptor.json             dist/production.json
+          python3 scripts/validate_manifest.py dist/production.json
+
+      - name: Open/update human-gated manifest PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODEL: ${{ inputs.model }}
+          REVISION: ${{ inputs.revision }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="candidate/${MODEL}-r${REVISION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          cp dist/production.json manifests/production.json
+          git add manifests/production.json
+          git commit -m "Candidate: ${MODEL} r${REVISION}" || true
+          git push --force-with-lease origin "$branch"
+          if ! gh pr view "$branch" >/dev/null 2>&1; then
+            gh pr create               --base main               --head "$branch"               --title "Candidate: ${MODEL} r${REVISION}"               --body "Do not merge until Voica Android has downloaded the candidate, passed package/file verification, native sherpa smoke activation, and the relevant real-device transcription acceptance."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.model }}-candidate-r${{ inputs.revision }}
+          path: |
+            dist/model-descriptor.json
+            dist/production.json
+          retention-days: 7
