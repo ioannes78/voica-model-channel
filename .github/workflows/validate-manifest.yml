@@ -5,7 +5,8 @@ on:
     branches: [ main ]
     paths:
       - "manifests/**"
-      - "scripts/validate_manifest.py"
+      - "scripts/**"
+      - ".github/workflows/**"
   pull_request:
     branches: [ main ]
     paths:
