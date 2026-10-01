@@ -54,6 +54,18 @@ jobs:
           python3 scripts/upsert_model.py             manifests/production.json             dist/model-descriptor.json             dist/production.json
           python3 scripts/validate_manifest.py dist/production.json
 
+      - name: Publish candidate manifest metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.prepare.outputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" \
+            dist/model-descriptor.json \
+            dist/production.json \
+            --clobber
+
       - name: Open/update human-gated manifest PR
         env:
           GH_TOKEN: ${{ github.token }}
