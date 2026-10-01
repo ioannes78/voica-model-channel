@@ -46,7 +46,7 @@ jobs:
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "dist/$PACKAGE" "dist/source-provenance.json" --clobber
           else
-            gh release create "$TAG"               "dist/$PACKAGE" "dist/source-provenance.json"               --prerelease               --title "Candidate: Small Bilingual r${{ inputs.revision }}"               --notes "Candidate only. Do not merge the manifest PR until Android native smoke and transcription acceptance pass."
+            gh release create "$TAG"               "dist/$PACKAGE" "dist/source-provenance.json"               --prerelease               --title "Candidate: Small Bilingual r${{ inputs.revision }}"               --notes "Candidate only. Do not merge the manifest PR until Android package/file verification and the streaming-ASR native smoke activation pass. Full Fast transcription is gated by the later punctuation candidate."
           fi
 
       - name: Generate candidate production manifest
@@ -82,7 +82,7 @@ jobs:
           git commit -m "Candidate: Small Bilingual r${REVISION}" || true
           git push --force-with-lease origin "$branch"
           if ! gh pr view "$branch" >/dev/null 2>&1; then
-            gh pr create               --base main               --head "$branch"               --title "Candidate: Small Bilingual r${REVISION}"               --body "Do not merge until Voica Android has downloaded this candidate, passed package/file verification, native sherpa smoke activation, and real-device Fast transcription acceptance."
+            gh pr create               --base main               --head "$branch"               --title "Candidate: Small Bilingual r${REVISION}"               --body "Stage 8 order: this is the first downloadable model. Do not merge until Voica Android has downloaded it and passed package/file verification plus the streaming-ASR native smoke activation. Full Fast transcription is intentionally deferred to the punctuation candidate, which is generated after this PR is merged."
           fi
 
       - uses: actions/upload-artifact@v4
