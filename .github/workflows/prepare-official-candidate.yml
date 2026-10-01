@@ -36,6 +36,29 @@ jobs:
           python3 scripts/upsert_model.py             manifests/production.json             dist/model-descriptor.json             dist/production.json
           python3 scripts/validate_manifest.py dist/production.json
 
+      - name: Publish/update prerelease candidate manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODEL: ${{ inputs.model }}
+          REVISION: ${{ inputs.revision }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="candidate-${MODEL}-r${REVISION}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" \
+              dist/model-descriptor.json \
+              dist/production.json \
+              --clobber
+          else
+            gh release create "$tag" \
+              dist/model-descriptor.json \
+              dist/production.json \
+              --prerelease \
+              --title "Candidate: ${MODEL} r${REVISION}" \
+              --notes "Candidate manifest only. The model package remains on the pinned official upstream release. Do not merge the manifest PR until Android package/file verification, native sherpa smoke activation, and the relevant real-device transcription acceptance pass."
+          fi
+
       - name: Open/update human-gated manifest PR
         env:
           GH_TOKEN: ${{ github.token }}
