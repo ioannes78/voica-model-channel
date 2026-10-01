@@ -3,7 +3,9 @@ set -euo pipefail
 
 SOURCE_URL="${SOURCE_URL:-https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16.tar.bz2}"
 SOURCE_ASSET_ID="${SOURCE_ASSET_ID:-157661357}"
+SOURCE_ASSET_NAME="${SOURCE_ASSET_NAME:-sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16.tar.bz2}"
 SOURCE_EXPECTED_BYTES="${SOURCE_EXPECTED_BYTES:-458187351}"
+SOURCE_ASSET_API="${SOURCE_ASSET_API:-https://api.github.com/repos/k2-fsa/sherpa-onnx/releases/assets/${SOURCE_ASSET_ID}}"
 REVISION="${REVISION:-1}"
 OUT_DIR="${OUT_DIR:-dist}"
 CANDIDATE_DOWNLOAD_URL="${CANDIDATE_DOWNLOAD_URL:?CANDIDATE_DOWNLOAD_URL is required}"
@@ -15,6 +17,34 @@ mkdir -p "$OUT_DIR" "$work/source" "$work/package"
 OUT_DIR_ABS="$(cd "$OUT_DIR" && pwd)"
 
 archive="$work/source.tar.bz2"
+
+asset_metadata="$work/asset.json"
+curl --fail --location --proto '=https' --tlsv1.2 --retry 3 \
+  -H 'Accept: application/vnd.github+json' \
+  "$SOURCE_ASSET_API" -o "$asset_metadata"
+python3 - "$asset_metadata" "$SOURCE_ASSET_ID" "$SOURCE_ASSET_NAME" \
+  "$SOURCE_EXPECTED_BYTES" "$SOURCE_URL" <<'PY'
+import json
+import sys
+
+path, expected_id, expected_name, expected_bytes, expected_url = sys.argv[1:]
+with open(path, "r", encoding="utf-8") as f:
+    asset = json.load(f)
+
+checks = {
+    "id": (int(asset.get("id", -1)), int(expected_id)),
+    "name": (asset.get("name"), expected_name),
+    "size": (int(asset.get("size", -1)), int(expected_bytes)),
+    "browser_download_url": (asset.get("browser_download_url"), expected_url),
+}
+for field, (actual, expected) in checks.items():
+    if actual != expected:
+        raise SystemExit(
+            f"upstream GitHub release asset {field} mismatch: "
+            f"{actual!r} != {expected!r}"
+        )
+PY
+
 curl --fail --location --proto '=https' --tlsv1.2 --retry 3 "$SOURCE_URL" -o "$archive"
 
 actual_bytes="$(stat -c '%s' "$archive")"
