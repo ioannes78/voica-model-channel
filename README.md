@@ -70,3 +70,21 @@ and the relevant transcription acceptance, then merge the manifest PR. Restore t
 Debug App to production afterward.
 
 Release builds do not accept this override and always use the production manifest.
+
+## Stage 8 candidate order and gates
+
+Candidates are intentionally validated and merged in dependency order:
+
+1. **Small Bilingual r1** — verify package/file integrity and pass the
+   streaming-ASR native smoke activation, then merge its manifest PR. A complete
+   Fast transcription cannot run yet because punctuation is not production-ready.
+2. **CT-Transformer punctuation r1** — the generated candidate manifest now includes
+   production Small Bilingual. Pass punctuation native smoke **and a real short Fast
+   transcription** through VAD -> streaming ASR -> punctuation, then merge.
+3. **SenseVoice 2024 int8 r1** — the candidate manifest now includes production
+   Small Bilingual + punctuation. Pass SenseVoice native smoke **and a real short
+   High Quality two-pass transcription**, then merge.
+
+The official-candidate workflow enforces these prerequisites and fails if punctuation
+is requested before Small Bilingual is in production, or SenseVoice is requested
+before both Small Bilingual and punctuation are in production.
