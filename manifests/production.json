@@ -1,12 +1,74 @@
 {
   "catalogVersion": 1,
-  "manifestVersion": 2,
+  "manifestVersion": 3,
   "channel": "production",
-  "publishedAt": "2026-10-01T18:08:39Z",
-  "manifestDigest": "91ed1d83ac8e1d7b1108dc56129d697da9d3890215bb344d304abc261330d79f",
+  "publishedAt": "2026-10-01T18:21:01Z",
+  "manifestDigest": "74001890235e9293989674b76b2f06abc7bcd920dd2f758a35d58bb17642abfb",
   "signature": null,
   "keyId": null,
   "models": [
+    {
+      "modelId": "ct-transformer-zh-en-int8",
+      "kind": "PUNCTUATION",
+      "displayName": "CT-Transformer zh-en punctuation int8",
+      "version": "2024-04-12",
+      "revision": 1,
+      "runtimeId": "sherpa-onnx",
+      "runtimeVersionMin": "1.13.8",
+      "runtimeVersionMax": null,
+      "languages": [
+        "zh",
+        "en"
+      ],
+      "capabilities": {
+        "supportsStreaming": false,
+        "supportsPartial": false,
+        "supportsTokenTiming": false,
+        "supportsLanguageDetection": false,
+        "supportsConfidence": false,
+        "supportsInverseTextNormalization": false,
+        "supportsSecondPass": false,
+        "supportsHotwords": false
+      },
+      "sourceType": "MANAGED_DOWNLOAD",
+      "builtinAssetPath": null,
+      "download": {
+        "packageFormat": "TAR_BZ2",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8.tar.bz2",
+        "mirrors": [],
+        "sizeBytes": 64717756,
+        "sha256": "c0d5aa5f8eeb686032345e180bedf39319dc2e0556781c6264bcadba8328a6e1"
+      },
+      "installedSizeBytes": 75519198,
+      "files": [
+        {
+          "relativePath": "model.int8.onnx",
+          "sizeBytes": 75519198,
+          "sha256": "65a3fb9f5ad7bfb96bf69e0dc4481df97f6ee60513c1d94ce981ba6effd524b1",
+          "packagePath": "sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8/model.int8.onnx"
+        }
+      ],
+      "compatibility": {
+        "abis": [
+          "arm64-v8a"
+        ],
+        "minSdk": 26,
+        "appVersionMin": 20,
+        "appVersionMax": null
+      },
+      "license": {
+        "id": "Apache-2.0",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/blob/master/LICENSE",
+        "attribution": "k2-fsa CT-Transformer punctuation zh-en 2024-04-12",
+        "redistributionPolicy": "UPSTREAM_ONLY"
+      },
+      "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8.tar.bz2",
+      "homepage": "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/index.html",
+      "releaseChannel": "production",
+      "autoUpdateEligible": false,
+      "deprecated": false,
+      "criticalUpdate": false
+    },
     {
       "modelId": "silero-vad-int8",
       "kind": "VAD",
