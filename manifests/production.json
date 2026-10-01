@@ -1,9 +1,9 @@
 {
   "catalogVersion": 1,
-  "manifestVersion": 3,
+  "manifestVersion": 4,
   "channel": "production",
-  "publishedAt": "2026-10-01T18:21:01Z",
-  "manifestDigest": "74001890235e9293989674b76b2f06abc7bcd920dd2f758a35d58bb17642abfb",
+  "publishedAt": "2026-10-01T19:39:19Z",
+  "manifestDigest": "ceff5a281acd1166a75e53c9112dd88e93c9e0266d6a545651159a97ebc0154b",
   "signature": null,
   "keyId": null,
   "models": [
@@ -63,6 +63,77 @@
         "redistributionPolicy": "UPSTREAM_ONLY"
       },
       "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8.tar.bz2",
+      "homepage": "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/index.html",
+      "releaseChannel": "production",
+      "autoUpdateEligible": false,
+      "deprecated": false,
+      "criticalUpdate": false
+    },
+    {
+      "modelId": "sensevoice-2024-int8",
+      "kind": "ASR_SECOND_PASS",
+      "displayName": "SenseVoice zh-en-ja-ko-yue int8",
+      "version": "2024-07-17",
+      "revision": 1,
+      "runtimeId": "sherpa-onnx",
+      "runtimeVersionMin": "1.13.8",
+      "runtimeVersionMax": null,
+      "languages": [
+        "zh",
+        "en",
+        "ja",
+        "ko",
+        "yue"
+      ],
+      "capabilities": {
+        "supportsStreaming": false,
+        "supportsPartial": false,
+        "supportsTokenTiming": true,
+        "supportsLanguageDetection": true,
+        "supportsConfidence": false,
+        "supportsInverseTextNormalization": true,
+        "supportsSecondPass": true,
+        "supportsHotwords": false
+      },
+      "sourceType": "MANAGED_DOWNLOAD",
+      "builtinAssetPath": null,
+      "download": {
+        "packageFormat": "TAR_BZ2",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17.tar.bz2",
+        "mirrors": [],
+        "sizeBytes": 163002883,
+        "sha256": "7d1efa2138a65b0b488df37f8b89e3d91a60676e416f515b952358d83dfd347e"
+      },
+      "installedSizeBytes": 239549735,
+      "files": [
+        {
+          "relativePath": "model.int8.onnx",
+          "sizeBytes": 239233841,
+          "sha256": "c71f0ce00bec95b07744e116345e33d8cbbe08cef896382cf907bf4b51a2cd51",
+          "packagePath": "sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17/model.int8.onnx"
+        },
+        {
+          "relativePath": "tokens.txt",
+          "sizeBytes": 315894,
+          "sha256": "f449eb28dc567533d7fa59be34e2abca8784f771850c78a47fb731a31429a1dc",
+          "packagePath": "sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17/tokens.txt"
+        }
+      ],
+      "compatibility": {
+        "abis": [
+          "arm64-v8a"
+        ],
+        "minSdk": 26,
+        "appVersionMin": 20,
+        "appVersionMax": null
+      },
+      "license": {
+        "id": "Apache-2.0",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/blob/master/LICENSE",
+        "attribution": "k2-fsa SenseVoice int8 2024-07-17",
+        "redistributionPolicy": "UPSTREAM_ONLY"
+      },
+      "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-sense-voice-zh-en-ja-ko-yue-int8-2024-07-17.tar.bz2",
       "homepage": "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/index.html",
       "releaseChannel": "production",
       "autoUpdateEligible": false,
