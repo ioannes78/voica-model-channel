@@ -25,37 +25,64 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Prepare pinned upstream speaker models
+      - name: Resolve candidate revision
+        shell: bash
+        env:
+          DISPATCH_REVISION: ${{ inputs.revision }}
         run: |
           set -euo pipefail
-          python3 scripts/prepare-speaker-diarization.py             "$REVISION"             dist
+          revision="${DISPATCH_REVISION:-1}"
+          echo "REVISION=${revision}" >> "$GITHUB_ENV"
+
+      - name: Prepare pinned upstream speaker models
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/prepare-speaker-diarization.py "$REVISION" dist
 
       - name: Generate bundled candidate production manifest
+        shell: bash
         run: |
           set -euo pipefail
-          python3 scripts/upsert_model.py             manifests/production.json             dist/segmentation-model-descriptor.json             dist/production-step1.json
-          python3 scripts/upsert_model.py             dist/production-step1.json             dist/embedding-model-descriptor.json             dist/production.json
+          python3 scripts/upsert_model.py \
+            manifests/production.json \
+            dist/segmentation-model-descriptor.json \
+            dist/production-step1.json
+          python3 scripts/upsert_model.py \
+            dist/production-step1.json \
+            dist/embedding-model-descriptor.json \
+            dist/production.json
           python3 scripts/validate_manifest.py dist/production.json
 
       - name: Publish/update prerelease candidate manifest
         env:
           GH_TOKEN: ${{ github.token }}
-          REVISION: $REVISION
         shell: bash
         run: |
           set -euo pipefail
           tag="candidate-speaker-diarization-r${REVISION}"
           notes="Stage 9 bundle candidate only. Both pyannote segmentation int8 and ERes2Net embedding must pass Android package/file verification, individual native validation, pyannote+ERes2Net bundle smoke, and Stage 9 real-device diarization acceptance before the manifest PR can be merged."
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag"               dist/segmentation-model-descriptor.json               dist/embedding-model-descriptor.json               dist/speaker-model-descriptors.json               dist/production.json               --clobber
+            gh release upload "$tag" \
+              dist/segmentation-model-descriptor.json \
+              dist/embedding-model-descriptor.json \
+              dist/speaker-model-descriptors.json \
+              dist/production.json \
+              --clobber
           else
-            gh release create "$tag"               dist/segmentation-model-descriptor.json               dist/embedding-model-descriptor.json               dist/speaker-model-descriptors.json               dist/production.json               --prerelease               --title "Candidate: speaker diarization r${REVISION}"               --notes "$notes"
+            gh release create "$tag" \
+              dist/segmentation-model-descriptor.json \
+              dist/embedding-model-descriptor.json \
+              dist/speaker-model-descriptors.json \
+              dist/production.json \
+              --prerelease \
+              --title "Candidate: speaker diarization r${REVISION}" \
+              --notes "$notes"
           fi
 
       - name: Open/update human-gated manifest PR
         env:
           GH_TOKEN: ${{ github.token }}
-          REVISION: $REVISION
         shell: bash
         run: |
           set -euo pipefail
@@ -68,7 +95,11 @@ jobs:
           git commit -m "Candidate: speaker diarization r${REVISION}" || true
           git push --force-with-lease origin "$branch"
           if ! gh pr view "$branch" >/dev/null 2>&1; then
-            if ! gh pr create               --base main               --head "$branch"               --title "Candidate: speaker diarization r${REVISION}"               --body "Do not merge until Voica Stage 9 has installed both speaker models, passed exact package/file verification, individual native validation, pyannote+ERes2Net bundle smoke, and user-confirmed real-device speaker diarization acceptance."; then
+            if ! gh pr create \
+              --base main \
+              --head "$branch" \
+              --title "Candidate: speaker diarization r${REVISION}" \
+              --body "Do not merge until Voica Stage 9 has installed both speaker models, passed exact package/file verification, individual native validation, pyannote+ERes2Net bundle smoke, and user-confirmed real-device speaker diarization acceptance."; then
               echo "::warning::GitHub Actions could not create the PR automatically."
               echo "Manual PR: https://github.com/${{ github.repository }}/compare/main...${branch}?expand=1"
             fi
@@ -76,7 +107,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: speaker-diarization-candidate-r$REVISION
+          name: speaker-diarization-candidate
           path: |
             dist/segmentation-model-descriptor.json
             dist/embedding-model-descriptor.json
