@@ -19,6 +19,7 @@ MODELS = [
         "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-segmentation-models/sherpa-onnx-pyannote-segmentation-3-0.tar.bz2",
         "packageFormat": "TAR_BZ2",
         "expectedSize": 6958444,
+        "expectedSha256": "24615ee884c897d9d2ba09bb4d30da6bb1b15e685065962db5b02e76e4996488",
         "root": "sherpa-onnx-pyannote-segmentation-3-0",
         "files": [("model.int8.onnx", "model.int8.onnx")],
         "languages": ["und"],
@@ -37,6 +38,7 @@ MODELS = [
         "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx",
         "packageFormat": "SINGLE_FILE",
         "expectedSize": 39593761,
+        "expectedSha256": "1a331345f04805badbb495c775a6ddffcdd1a732567d5ec8b3d5749e3c7a5e4b",
         "files": [
             (
                 "3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx",
@@ -136,6 +138,10 @@ with tempfile.TemporaryDirectory() as temp_text:
                 + str(package.stat().st_size)
             )
         package_sha = sha256(package)
+        if package_sha != cfg["expectedSha256"]:
+            raise SystemExit(
+                cfg["modelId"] + " upstream package SHA-256 mismatch: " + package_sha
+            )
         files = inspect_files(cfg, package)
         descriptor = {
             "modelId": cfg["modelId"],
