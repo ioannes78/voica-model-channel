@@ -70,6 +70,13 @@ def validate_model(model) -> None:
     if not isinstance(model["files"], list) or not model["files"]:
         fail(model_id + " files must be non-empty")
 
+    speaker_role = model.get("speakerRole")
+    if model["kind"] == "SPEAKER":
+        if speaker_role not in ("DIARIZATION_SEGMENTATION", "EMBEDDING"):
+            fail(model_id + " SPEAKER model requires a valid speakerRole")
+    elif speaker_role is not None:
+        fail(model_id + " speakerRole is only valid for SPEAKER models")
+
     for entry in model["files"]:
         validate_file_entry(entry, model_id)
 
