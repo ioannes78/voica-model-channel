@@ -89,7 +89,7 @@ jobs:
           branch="candidate/speaker-diarization-r${REVISION}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B "$branch"
+          git checkout -B "$branch" origin/main
           cp dist/production.json manifests/production.json
           git add manifests/production.json
           git commit -m "Candidate: speaker diarization r${REVISION}" || true
