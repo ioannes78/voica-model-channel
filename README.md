@@ -88,3 +88,14 @@ Candidates are intentionally validated and merged in dependency order:
 The official-candidate workflow enforces these prerequisites and fails if punctuation
 is requested before Small Bilingual is in production, or SenseVoice is requested
 before both Small Bilingual and punctuation are in production.
+
+## Stage 9 speaker diarization candidate
+
+Stage 9 treats the speaker stack as one validation bundle:
+
+- Segmentation: pyannote segmentation 3.0 int8 (ModelKind=SPEAKER, speakerRole=DIARIZATION_SEGMENTATION).
+- Embedding: 3D-Speaker ERes2Net Base zh-cn 16 kHz (ModelKind=SPEAKER, speakerRole=EMBEDDING).
+
+The **Prepare Speaker Diarization Candidate** workflow downloads the pinned official sherpa-onnx release assets, checks their expected GitHub release sizes, computes package SHA-256 values during the workflow, extracts only the required installed files, computes exact installed file size/SHA-256 metadata, and emits one candidate production manifest containing both models.
+
+Both descriptors use appVersionMin=24 and UPSTREAM_ONLY. The workflow does not mirror the upstream model packages. Its candidate PR must not be merged until Voica Android has installed both exact revisions, passed individual native validation plus the pyannote+ERes2Net bundle smoke, and completed the Stage 9 real-device diarization acceptance. Candidate generation never enables runtime automatic fallback and does not make CAM++ or TitaNet user-selectable.
