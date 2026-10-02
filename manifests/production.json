@@ -1,12 +1,74 @@
 {
   "catalogVersion": 1,
-  "manifestVersion": 4,
+  "manifestVersion": 6,
   "channel": "production",
-  "publishedAt": "2026-10-01T19:39:19Z",
-  "manifestDigest": "ceff5a281acd1166a75e53c9112dd88e93c9e0266d6a545651159a97ebc0154b",
+  "publishedAt": "2026-10-02T05:21:06Z",
+  "manifestDigest": "1bbbc9fd324049486674138e76c7d6323b8454eacbbe1830eef71b8367948447",
   "signature": null,
   "keyId": null,
   "models": [
+    {
+      "modelId": "3dspeaker-eres2net-base-zh-cn-16k",
+      "kind": "SPEAKER",
+      "speakerRole": "EMBEDDING",
+      "displayName": "3D-Speaker ERes2Net Base zh-cn 16k",
+      "version": "2023-12-08",
+      "revision": 1,
+      "runtimeId": "sherpa-onnx",
+      "runtimeVersionMin": "1.13.8",
+      "runtimeVersionMax": null,
+      "languages": [
+        "zh"
+      ],
+      "capabilities": {
+        "supportsStreaming": false,
+        "supportsPartial": false,
+        "supportsTokenTiming": false,
+        "supportsLanguageDetection": false,
+        "supportsConfidence": true,
+        "supportsInverseTextNormalization": false,
+        "supportsSecondPass": false,
+        "supportsHotwords": false
+      },
+      "sourceType": "MANAGED_DOWNLOAD",
+      "builtinAssetPath": null,
+      "download": {
+        "packageFormat": "SINGLE_FILE",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx",
+        "mirrors": [],
+        "sizeBytes": 39593761,
+        "sha256": "1a331345f04805badbb495c775a6ddffcdd1a732567d5ec8b3d5749e3c7a5e4b"
+      },
+      "installedSizeBytes": 39593761,
+      "files": [
+        {
+          "relativePath": "3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx",
+          "sizeBytes": 39593761,
+          "sha256": "1a331345f04805badbb495c775a6ddffcdd1a732567d5ec8b3d5749e3c7a5e4b",
+          "packagePath": "3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx"
+        }
+      ],
+      "compatibility": {
+        "abis": [
+          "arm64-v8a"
+        ],
+        "minSdk": 26,
+        "appVersionMin": 24,
+        "appVersionMax": null
+      },
+      "license": {
+        "id": "Apache-2.0",
+        "url": "https://github.com/alibaba-damo-academy/3D-Speaker/blob/main/LICENSE",
+        "attribution": "3D-Speaker ERes2Net Base zh-cn 16 kHz; sherpa-onnx release asset",
+        "redistributionPolicy": "UPSTREAM_ONLY"
+      },
+      "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/tag/speaker-recongition-models",
+      "homepage": "https://k2-fsa.github.io/sherpa/onnx/speaker-diarization/index.html",
+      "releaseChannel": "production",
+      "autoUpdateEligible": false,
+      "deprecated": false,
+      "criticalUpdate": false
+    },
     {
       "modelId": "ct-transformer-zh-en-int8",
       "kind": "PUNCTUATION",
@@ -64,6 +126,68 @@
       },
       "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/punctuation-models/sherpa-onnx-punct-ct-transformer-zh-en-vocab272727-2024-04-12-int8.tar.bz2",
       "homepage": "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/index.html",
+      "releaseChannel": "production",
+      "autoUpdateEligible": false,
+      "deprecated": false,
+      "criticalUpdate": false
+    },
+    {
+      "modelId": "pyannote-segmentation-3-int8",
+      "kind": "SPEAKER",
+      "speakerRole": "DIARIZATION_SEGMENTATION",
+      "displayName": "Pyannote Segmentation 3.0 int8",
+      "version": "3.0",
+      "revision": 1,
+      "runtimeId": "sherpa-onnx",
+      "runtimeVersionMin": "1.13.8",
+      "runtimeVersionMax": null,
+      "languages": [
+        "und"
+      ],
+      "capabilities": {
+        "supportsStreaming": false,
+        "supportsPartial": false,
+        "supportsTokenTiming": false,
+        "supportsLanguageDetection": false,
+        "supportsConfidence": true,
+        "supportsInverseTextNormalization": false,
+        "supportsSecondPass": false,
+        "supportsHotwords": false
+      },
+      "sourceType": "MANAGED_DOWNLOAD",
+      "builtinAssetPath": null,
+      "download": {
+        "packageFormat": "TAR_BZ2",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-segmentation-models/sherpa-onnx-pyannote-segmentation-3-0.tar.bz2",
+        "mirrors": [],
+        "sizeBytes": 6958444,
+        "sha256": "24615ee884c897d9d2ba09bb4d30da6bb1b15e685065962db5b02e76e4996488"
+      },
+      "installedSizeBytes": 1540506,
+      "files": [
+        {
+          "relativePath": "model.int8.onnx",
+          "sizeBytes": 1540506,
+          "sha256": "d582f4b4c6b48205de7e0643c57df0df5615a3c176189be3fc461e9d18827b5d",
+          "packagePath": "sherpa-onnx-pyannote-segmentation-3-0/model.int8.onnx"
+        }
+      ],
+      "compatibility": {
+        "abis": [
+          "arm64-v8a"
+        ],
+        "minSdk": 26,
+        "appVersionMin": 24,
+        "appVersionMax": null
+      },
+      "license": {
+        "id": "MIT",
+        "url": "https://huggingface.co/pyannote/segmentation-3.0/blob/main/LICENSE",
+        "attribution": "pyannote segmentation 3.0; sherpa-onnx ONNX/int8 export",
+        "redistributionPolicy": "UPSTREAM_ONLY"
+      },
+      "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/tag/speaker-segmentation-models",
+      "homepage": "https://k2-fsa.github.io/sherpa/onnx/speaker-diarization/index.html",
       "releaseChannel": "production",
       "autoUpdateEligible": false,
       "deprecated": false,
