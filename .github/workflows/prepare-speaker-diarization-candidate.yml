@@ -7,6 +7,11 @@ on:
         description: Voica speaker bundle revision
         required: true
         default: "1"
+  push:
+    branches:
+      - candidate-trigger/speaker-diarization-r1
+    paths:
+      - requests/speaker-diarization-r1.request
 
 permissions:
   contents: write
@@ -23,7 +28,7 @@ jobs:
       - name: Prepare pinned upstream speaker models
         run: |
           set -euo pipefail
-          python3 scripts/prepare-speaker-diarization.py             "${{ inputs.revision }}"             dist
+          python3 scripts/prepare-speaker-diarization.py             "$REVISION"             dist
 
       - name: Generate bundled candidate production manifest
         run: |
@@ -35,7 +40,7 @@ jobs:
       - name: Publish/update prerelease candidate manifest
         env:
           GH_TOKEN: ${{ github.token }}
-          REVISION: ${{ inputs.revision }}
+          REVISION: $REVISION
         shell: bash
         run: |
           set -euo pipefail
@@ -50,7 +55,7 @@ jobs:
       - name: Open/update human-gated manifest PR
         env:
           GH_TOKEN: ${{ github.token }}
-          REVISION: ${{ inputs.revision }}
+          REVISION: $REVISION
         shell: bash
         run: |
           set -euo pipefail
@@ -71,7 +76,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: speaker-diarization-candidate-r${{ inputs.revision }}
+          name: speaker-diarization-candidate-r$REVISION
           path: |
             dist/segmentation-model-descriptor.json
             dist/embedding-model-descriptor.json
