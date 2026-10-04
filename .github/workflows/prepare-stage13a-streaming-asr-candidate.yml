@@ -1,0 +1,116 @@
+name: Prepare Stage 13A Streaming ASR Candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      revision:
+        description: Voica Stage 13A streaming ASR bundle revision
+        required: true
+        default: "1"
+  push:
+    branches:
+      - candidate-trigger/stage13a-streaming-asr-r1
+    paths:
+      - requests/stage13a-streaming-asr-r1.request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve candidate revision
+        shell: bash
+        env:
+          DISPATCH_REVISION: ${{ inputs.revision }}
+        run: |
+          set -euo pipefail
+          revision="${DISPATCH_REVISION:-1}"
+          echo "REVISION=${revision}" >> "$GITHUB_ENV"
+
+      - name: Prepare pinned upstream streaming ASR models
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/prepare-stage13a-streaming-asr.py "$REVISION" dist
+
+      - name: Generate bundled candidate production manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/upsert_model.py \
+            manifests/production.json \
+            dist/transducer-model-descriptor.json \
+            dist/production-step1.json
+          python3 scripts/upsert_model.py \
+            dist/production-step1.json \
+            dist/ctc-model-descriptor.json \
+            dist/production.json
+          python3 scripts/validate_manifest.py dist/production.json
+
+      - name: Publish/update prerelease candidate manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="candidate-stage13a-streaming-asr-r${REVISION}"
+          notes="Stage 13A realtime-ASR bundle candidate only. The Chinese Large Transducer and CTC models must both pass Android package/file verification, sherpa-onnx native smoke, the 3-model realtime benchmark against Small Bilingual, and user-confirmed real-device acceptance before production promotion."
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" \
+              dist/transducer-model-descriptor.json \
+              dist/ctc-model-descriptor.json \
+              dist/streaming-asr-model-descriptors.json \
+              dist/production.json \
+              --clobber
+          else
+            gh release create "$tag" \
+              dist/transducer-model-descriptor.json \
+              dist/ctc-model-descriptor.json \
+              dist/streaming-asr-model-descriptors.json \
+              dist/production.json \
+              --prerelease \
+              --title "Candidate: Stage 13A streaming ASR r${REVISION}" \
+              --notes "$notes"
+          fi
+
+      - name: Open/update human-gated manifest PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch="candidate/stage13a-streaming-asr-r${REVISION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch" origin/main
+          cp dist/production.json manifests/production.json
+          git add manifests/production.json
+          git commit -m "Candidate: Stage 13A streaming ASR r${REVISION}" || true
+          git push --force-with-lease origin "$branch"
+          if ! gh pr view "$branch" >/dev/null 2>&1; then
+            if ! gh pr create \
+              --base main \
+              --head "$branch" \
+              --title "Candidate: Stage 13A streaming ASR r${REVISION}" \
+              --body "Do not merge until Voica Stage 13A has installed both 2025 Chinese streaming ASR models, passed exact package/file verification and native sherpa smoke, completed the 3-model realtime Android benchmark, and received user-confirmed real-device acceptance."; then
+              echo "::warning::GitHub Actions could not create the PR automatically."
+              echo "Manual PR: https://github.com/${{ github.repository }}/compare/main...${branch}?expand=1"
+            fi
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage13a-streaming-asr-candidate
+          path: |
+            dist/transducer-model-descriptor.json
+            dist/ctc-model-descriptor.json
+            dist/streaming-asr-model-descriptors.json
+            dist/production.json
+          retention-days: 7

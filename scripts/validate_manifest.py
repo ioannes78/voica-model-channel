@@ -77,6 +77,55 @@ def validate_model(model) -> None:
     elif speaker_role is not None:
         fail(model_id + " speakerRole is only valid for SPEAKER models")
 
+    capabilities = model["capabilities"]
+    if not isinstance(capabilities, dict):
+        fail(model_id + " capabilities must be an object")
+    for key in (
+        "supportsStreaming",
+        "supportsPartial",
+        "supportsTokenTiming",
+        "supportsLanguageDetection",
+        "supportsConfidence",
+        "supportsInverseTextNormalization",
+        "supportsSecondPass",
+        "supportsHotwords",
+    ):
+        if key not in capabilities or not isinstance(capabilities[key], bool):
+            fail(model_id + " invalid capability " + key)
+
+    execution_mode = capabilities.get("executionMode")
+    if execution_mode is not None and execution_mode not in (
+        "OFFLINE", "TRUE_STREAMING", "SECOND_PASS"
+    ):
+        fail(model_id + " invalid executionMode")
+    timestamp_capability = capabilities.get("timestampCapability")
+    if timestamp_capability is not None and timestamp_capability not in (
+        "NONE", "SEGMENT", "TOKEN", "EXTERNAL_ALIGNER_REQUIRED"
+    ):
+        fail(model_id + " invalid timestampCapability")
+    punctuation_mode = capabilities.get("punctuationMode")
+    if punctuation_mode is not None and punctuation_mode not in (
+        "NONE", "EXTERNAL", "NATIVE"
+    ):
+        fail(model_id + " invalid punctuationMode")
+    supported_parameters = capabilities.get("supportedParameters")
+    if supported_parameters is not None:
+        if not isinstance(supported_parameters, list) or any(
+            not isinstance(item, str) or not item for item in supported_parameters
+        ):
+            fail(model_id + " invalid supportedParameters")
+
+    runtime_model_type = model.get("runtimeModelType")
+    if runtime_model_type is not None and (
+        not isinstance(runtime_model_type, str) or not runtime_model_type
+    ):
+        fail(model_id + " invalid runtimeModelType")
+    quantization = model.get("quantization")
+    if quantization is not None and (
+        not isinstance(quantization, str) or not quantization
+    ):
+        fail(model_id + " invalid quantization")
+
     for entry in model["files"]:
         validate_file_entry(entry, model_id)
 

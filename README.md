@@ -99,3 +99,22 @@ Stage 9 treats the speaker stack as one validation bundle:
 The **Prepare Speaker Diarization Candidate** workflow downloads the pinned official sherpa-onnx release assets, checks their expected GitHub release sizes, computes package SHA-256 values during the workflow, extracts only the required installed files, computes exact installed file size/SHA-256 metadata, and emits one candidate production manifest containing both models.
 
 Both descriptors use appVersionMin=24 and UPSTREAM_ONLY. The workflow does not mirror the upstream model packages. Its candidate PR must not be merged until Voica Android has installed both exact revisions, passed individual native validation plus the pyannote+ERes2Net bundle smoke, and completed the Stage 9 real-device diarization acceptance. Candidate generation never enables runtime automatic fallback and does not make CAM++ or TitaNet user-selectable.
+
+
+## Stage 13A realtime ASR candidate
+
+Stage 13A keeps three true-streaming ASR models in the Android product matrix:
+
+- Small Bilingual Zipformer zh-en 2023-02-16 — low-resource compatibility/fallback.
+- Chinese Large Zipformer Transducer INT8 2025-06-30 — Chinese default candidate.
+- Chinese Large Zipformer CTC INT8 2025-06-30 — Chinese realtime challenger.
+
+The **Prepare Stage 13A Streaming ASR Candidate** workflow downloads the two new
+official sherpa-onnx release archives, verifies the GitHub-published package
+size/SHA-256, computes the exact installed-file size/SHA-256 values from the
+archives, and produces one human-gated candidate manifest containing both models.
+
+Both new models are declared as TRUE_STREAMING with TOKEN timestamps and use the
+existing sherpa-onnx 1.13.8 runtime. They are not promoted to production until the
+Voica Android branch passes native smoke, 3-model Chinese realtime benchmarking,
+and user-confirmed real-device acceptance.
