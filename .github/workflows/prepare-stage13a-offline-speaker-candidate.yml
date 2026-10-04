@@ -49,11 +49,20 @@ jobs:
             "https://github.com/ioannes78/voica-model-channel/releases/download/candidate-stage13a-streaming-asr-r1/production.json"
           python3 scripts/validate_manifest.py dist/base-production.json
 
+      - name: Prepare Stage 13A SenseVoice capability overlay
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/prepare-stage13a-sensevoice-overlay.py \
+            dist/base-production.json \
+            dist/sensevoice-model-descriptor.json
+
       - name: Generate combined Stage 13A candidate manifest
         shell: bash
         run: |
           set -euo pipefail
-          python3 scripts/upsert_model.py dist/base-production.json dist/firered-model-descriptor.json dist/step1.json
+          python3 scripts/upsert_model.py dist/base-production.json dist/sensevoice-model-descriptor.json dist/step0.json
+          python3 scripts/upsert_model.py dist/step0.json dist/firered-model-descriptor.json dist/step1.json
           python3 scripts/upsert_model.py dist/step1.json dist/qwen3-model-descriptor.json dist/step2.json
           python3 scripts/upsert_model.py dist/step2.json dist/campplus-model-descriptor.json dist/production.json
           python3 scripts/validate_manifest.py dist/production.json
@@ -70,6 +79,7 @@ jobs:
             dist/firered-model-descriptor.json
             dist/qwen3-model-descriptor.json
             dist/campplus-model-descriptor.json
+            dist/sensevoice-model-descriptor.json
             dist/offline-speaker-model-descriptors.json
             dist/production.json
           )
@@ -111,6 +121,7 @@ jobs:
             dist/firered-model-descriptor.json
             dist/qwen3-model-descriptor.json
             dist/campplus-model-descriptor.json
+            dist/sensevoice-model-descriptor.json
             dist/offline-speaker-model-descriptors.json
             dist/production.json
           retention-days: 7
