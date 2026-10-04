@@ -12,6 +12,11 @@ on:
       - candidate-trigger/stage13a-streaming-asr-r1
     paths:
       - requests/stage13a-streaming-asr-r1.request
+  pull_request:
+    branches:
+      - main
+    paths:
+      - requests/stage13a-streaming-asr-r1.request
 
 permissions:
   contents: write
