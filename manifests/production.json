@@ -1,9 +1,9 @@
 {
   "catalogVersion": 1,
-  "manifestVersion": 6,
+  "manifestVersion": 8,
   "channel": "production",
-  "publishedAt": "2026-10-02T05:21:06Z",
-  "manifestDigest": "1bbbc9fd324049486674138e76c7d6323b8454eacbbe1830eef71b8367948447",
+  "publishedAt": "2026-10-04T10:53:23Z",
+  "manifestDigest": "8653d78d34b152b5791d10a35819da705ffdfefe7f38769c9dc4fb5017dd8b6c",
   "signature": null,
   "keyId": null,
   "models": [
@@ -316,6 +316,172 @@
       "homepage": "https://github.com/snakers4/silero-vad",
       "releaseChannel": "production",
       "autoUpdateEligible": true,
+      "deprecated": false,
+      "criticalUpdate": false
+    },
+    {
+      "modelId": "zipformer-large-zh-ctc-int8",
+      "kind": "ASR_STREAMING",
+      "displayName": "Chinese Large Zipformer CTC INT8",
+      "version": "2025-06-30",
+      "revision": 1,
+      "runtimeId": "sherpa-onnx",
+      "runtimeVersionMin": "1.13.8",
+      "runtimeVersionMax": null,
+      "runtimeModelType": "zipformer2-ctc",
+      "quantization": "INT8",
+      "languages": [
+        "zh"
+      ],
+      "capabilities": {
+        "supportsStreaming": true,
+        "supportsPartial": true,
+        "supportsTokenTiming": true,
+        "supportsLanguageDetection": false,
+        "supportsConfidence": false,
+        "supportsInverseTextNormalization": false,
+        "supportsSecondPass": false,
+        "supportsHotwords": false,
+        "executionMode": "TRUE_STREAMING",
+        "timestampCapability": "TOKEN",
+        "supportsLanguageForcing": false,
+        "punctuationMode": "EXTERNAL",
+        "supportedParameters": [
+          "numThreads"
+        ]
+      },
+      "sourceType": "MANAGED_DOWNLOAD",
+      "builtinAssetPath": null,
+      "download": {
+        "packageFormat": "TAR_BZ2",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-ctc-zh-int8-2025-06-30.tar.bz2",
+        "mirrors": [],
+        "sizeBytes": 127965713,
+        "sha256": "f2ab7a5deb02717801f6a5b26c751b42f8a2db891b07f5b095e6da7442081448"
+      },
+      "installedSizeBytes": 162311515,
+      "files": [
+        {
+          "relativePath": "model.int8.onnx",
+          "sizeBytes": 162290887,
+          "sha256": "24ffdc19ba9aaed5a6a9beaede1e087745217d82425cf4041bca0c696661801e",
+          "packagePath": "sherpa-onnx-streaming-zipformer-ctc-zh-int8-2025-06-30/model.int8.onnx"
+        },
+        {
+          "relativePath": "tokens.txt",
+          "sizeBytes": 20628,
+          "sha256": "6193c7ea1c96d0d9a1e9652789b40d13a8a913b434a5451e93158f5a09fd6652",
+          "packagePath": "sherpa-onnx-streaming-zipformer-ctc-zh-int8-2025-06-30/tokens.txt"
+        }
+      ],
+      "compatibility": {
+        "abis": [
+          "arm64-v8a"
+        ],
+        "minSdk": 26,
+        "appVersionMin": 41,
+        "appVersionMax": null
+      },
+      "license": {
+        "id": "Apache-2.0",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/blob/master/LICENSE",
+        "attribution": "k2-fsa / icefall Chinese Large streaming Zipformer CTC INT8 2025-06-30",
+        "redistributionPolicy": "UPSTREAM_ONLY"
+      },
+      "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-ctc-zh-int8-2025-06-30.tar.bz2",
+      "homepage": "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/index.html",
+      "releaseChannel": "production",
+      "autoUpdateEligible": false,
+      "deprecated": false,
+      "criticalUpdate": false
+    },
+    {
+      "modelId": "zipformer-large-zh-transducer-int8",
+      "kind": "ASR_STREAMING",
+      "displayName": "Chinese Large Zipformer Transducer INT8",
+      "version": "2025-06-30",
+      "revision": 1,
+      "runtimeId": "sherpa-onnx",
+      "runtimeVersionMin": "1.13.8",
+      "runtimeVersionMax": null,
+      "runtimeModelType": "zipformer2-transducer",
+      "quantization": "INT8",
+      "languages": [
+        "zh"
+      ],
+      "capabilities": {
+        "supportsStreaming": true,
+        "supportsPartial": true,
+        "supportsTokenTiming": true,
+        "supportsLanguageDetection": false,
+        "supportsConfidence": false,
+        "supportsInverseTextNormalization": false,
+        "supportsSecondPass": false,
+        "supportsHotwords": false,
+        "executionMode": "TRUE_STREAMING",
+        "timestampCapability": "TOKEN",
+        "supportsLanguageForcing": false,
+        "punctuationMode": "EXTERNAL",
+        "supportedParameters": [
+          "numThreads",
+          "decodingMethod",
+          "maxActivePaths"
+        ]
+      },
+      "sourceType": "MANAGED_DOWNLOAD",
+      "builtinAssetPath": null,
+      "download": {
+        "packageFormat": "TAR_BZ2",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-zh-int8-2025-06-30.tar.bz2",
+        "mirrors": [],
+        "sizeBytes": 132634597,
+        "sha256": "5a2832047ea1f97dd0dc595b816c230c4bafad65cfc0341fa57517cadc50afd0"
+      },
+      "installedSizeBytes": 167360920,
+      "files": [
+        {
+          "relativePath": "encoder.int8.onnx",
+          "sizeBytes": 161141793,
+          "sha256": "5ac51e27981bb4dab01bb9be4958453ba50c3b61c063ddda0eab23fd3671aa4f",
+          "packagePath": "sherpa-onnx-streaming-zipformer-zh-int8-2025-06-30/encoder.int8.onnx"
+        },
+        {
+          "relativePath": "decoder.onnx",
+          "sizeBytes": 5165083,
+          "sha256": "06522ad63cec0fdf6809f4e1db9bb4f7d710c34582e3b35db62ac60eccafac7e",
+          "packagePath": "sherpa-onnx-streaming-zipformer-zh-int8-2025-06-30/decoder.onnx"
+        },
+        {
+          "relativePath": "joiner.int8.onnx",
+          "sizeBytes": 1033416,
+          "sha256": "b34584dc6f561089e1d747fedebb3765f2caa72c927ef54d7ca55e5ae40a814b",
+          "packagePath": "sherpa-onnx-streaming-zipformer-zh-int8-2025-06-30/joiner.int8.onnx"
+        },
+        {
+          "relativePath": "tokens.txt",
+          "sizeBytes": 20628,
+          "sha256": "6193c7ea1c96d0d9a1e9652789b40d13a8a913b434a5451e93158f5a09fd6652",
+          "packagePath": "sherpa-onnx-streaming-zipformer-zh-int8-2025-06-30/tokens.txt"
+        }
+      ],
+      "compatibility": {
+        "abis": [
+          "arm64-v8a"
+        ],
+        "minSdk": 26,
+        "appVersionMin": 41,
+        "appVersionMax": null
+      },
+      "license": {
+        "id": "Apache-2.0",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/blob/master/LICENSE",
+        "attribution": "k2-fsa / icefall Chinese Large streaming Zipformer Transducer INT8 2025-06-30",
+        "redistributionPolicy": "UPSTREAM_ONLY"
+      },
+      "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-zh-int8-2025-06-30.tar.bz2",
+      "homepage": "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/index.html",
+      "releaseChannel": "production",
+      "autoUpdateEligible": false,
       "deprecated": false,
       "criticalUpdate": false
     },
