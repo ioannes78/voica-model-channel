@@ -103,7 +103,7 @@ MODELS = [
         "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_campplus_sv_zh-cn_16k-common.onnx",
         "packageFormat": "SINGLE_FILE",
         "expectedSize": 28281138,
-        "expectedSha256": None,
+        "expectedSha256": "f682b514c05d947ee3fa91cd6ec6c5c7543479a128373fa29b1faedccd21fd11",
         "runtimeModelType": None,
         "languages": ["zh"],
         "capabilities": {
