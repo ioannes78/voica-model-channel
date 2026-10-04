@@ -1,0 +1,2 @@
+revision=1
+models=zipformer-large-zh-transducer-int8,zipformer-large-zh-ctc-int8
