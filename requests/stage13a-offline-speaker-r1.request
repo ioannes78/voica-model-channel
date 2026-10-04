@@ -1,0 +1,3 @@
+revision=1
+models=fireredasr2-ctc-zh-en-int8,qwen3-asr-0.6b-int8,3dspeaker-campplus-zh-cn-16k
+base=candidate-stage13a-streaming-asr-r1
