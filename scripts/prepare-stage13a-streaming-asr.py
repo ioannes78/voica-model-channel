@@ -25,6 +25,11 @@ MODELS = [
             ("tokens.txt", "tokens.txt"),
         ],
         "runtimeModelType": "zipformer2-transducer",
+        "supportedParameters": [
+            "numThreads",
+            "decodingMethod",
+            "maxActivePaths",
+        ],
         "attribution": "k2-fsa / icefall Chinese Large streaming Zipformer Transducer INT8 2025-06-30",
     },
     {
@@ -41,6 +46,9 @@ MODELS = [
             ("tokens.txt", "tokens.txt"),
         ],
         "runtimeModelType": "zipformer2-ctc",
+        "supportedParameters": [
+            "numThreads",
+        ],
         "attribution": "k2-fsa / icefall Chinese Large streaming Zipformer CTC INT8 2025-06-30",
     },
 ]
@@ -115,11 +123,6 @@ base_capabilities = {
     "timestampCapability": "TOKEN",
     "supportsLanguageForcing": False,
     "punctuationMode": "EXTERNAL",
-    "supportedParameters": [
-        "numThreads",
-        "decodingMethod",
-        "maxActivePaths",
-    ],
 }
 
 descriptors = []
@@ -156,7 +159,10 @@ with tempfile.TemporaryDirectory() as temp_text:
             "runtimeModelType": cfg["runtimeModelType"],
             "quantization": "INT8",
             "languages": ["zh"],
-            "capabilities": dict(base_capabilities),
+            "capabilities": {
+                **base_capabilities,
+                "supportedParameters": cfg["supportedParameters"],
+            },
             "sourceType": "MANAGED_DOWNLOAD",
             "builtinAssetPath": None,
             "download": {
