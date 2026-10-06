@@ -1,0 +1,86 @@
+name: Promote Stage 13A Production v7
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - requests/promote-stage13a-production-v7.request
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build production v7 from accepted Stage 13A candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin cd3ac5ff16177f056abdc52c19a024463320d5e2 || true
+          git show cd3ac5ff16177f056abdc52c19a024463320d5e2:manifests/production.json > /tmp/stage13a.json
+          python3 - <<'PY'
+          import datetime
+          import hashlib
+          import json
+          from pathlib import Path
+
+          keep = {
+              "3dspeaker-campplus-zh-cn-16k",
+              "3dspeaker-eres2net-base-zh-cn-16k",
+              "ct-transformer-zh-en-int8",
+              "pyannote-segmentation-3-int8",
+              "qwen3-asr-0.6b-int8",
+              "sensevoice-2024-int8",
+              "silero-vad-int8",
+              "zipformer-large-zh-ctc-int8",
+              "zipformer-small-bilingual",
+          }
+          source = json.loads(Path('/tmp/stage13a.json').read_text(encoding='utf-8'))
+          by_id = {model['modelId']: model for model in source['models']}
+          missing = keep - by_id.keys()
+          if missing:
+              raise SystemExit(f'missing accepted models: {sorted(missing)}')
+          models = [model for model in source['models'] if model['modelId'] in keep]
+          ids = [model['modelId'] for model in models]
+          if len(models) != len(keep) or set(ids) != keep:
+              raise SystemExit('unexpected production model matrix')
+          forbidden = {'fireredasr2-ctc-zh-en-int8', 'zipformer-large-zh-transducer-int8'}
+          if forbidden & set(ids):
+              raise SystemExit('rejected Stage 13A models leaked into production')
+          compact = json.dumps(models, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+          output = {
+              'catalogVersion': 1,
+              'manifestVersion': 7,
+              'channel': 'production',
+              'publishedAt': datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z'),
+              'manifestDigest': hashlib.sha256(compact).hexdigest(),
+              'signature': None,
+              'keyId': None,
+              'models': models,
+          }
+          Path('manifests/production.json').write_text(
+              json.dumps(output, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8',
+          )
+          print('production model ids:')
+          print('\n'.join(ids))
+          PY
+
+      - name: Validate promoted production manifest
+        run: python3 scripts/validate_manifest.py manifests/production.json
+
+      - name: Commit production v7
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifests/production.json
+          git commit -m "Promote accepted Stage 13A models to production v7"
+          git push origin HEAD:main
