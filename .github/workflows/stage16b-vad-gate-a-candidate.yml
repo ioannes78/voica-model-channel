@@ -1,0 +1,100 @@
+name: Stage 16B VAD Gate A Candidate
+
+on:
+  push:
+    branches:
+      - stage16b-vad-gate-a-candidate
+    paths:
+      - ".github/workflows/stage16b-vad-gate-a-candidate.yml"
+      - "scripts/upsert_model.py"
+      - "scripts/validate_manifest.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage16b-vad-gate-a-candidate
+  cancel-in-progress: true
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify manifest tooling syntax
+        run: |
+          python3 -m py_compile scripts/upsert_model.py scripts/validate_manifest.py
+
+      - name: Fetch already-verified FSMN and TEN descriptors
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/fsmn dist/ten
+          gh release download candidate-fsmn-vad-r1 \
+            --pattern model-descriptor.json \
+            --dir dist/fsmn \
+            --clobber
+          gh release download candidate-ten-vad-r1 \
+            --pattern model-descriptor.json \
+            --dir dist/ten \
+            --clobber
+
+      - name: Build combined Gate A manifest from immutable production baseline
+        run: |
+          python3 scripts/upsert_model.py \
+            manifests/production.json \
+            dist/fsmn/model-descriptor.json \
+            dist/with-fsmn.json
+          python3 scripts/upsert_model.py \
+            dist/with-fsmn.json \
+            dist/ten/model-descriptor.json \
+            dist/production.json
+          python3 scripts/validate_manifest.py dist/production.json
+
+      - name: Verify Gate A candidate identities and production isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          base = json.loads(Path("manifests/production.json").read_text())
+          combined = json.loads(Path("dist/production.json").read_text())
+          ids = {item["modelId"] for item in combined["models"]}
+          assert "fsmn-vad-int8" in ids
+          assert "ten-vad-fp32" in ids
+          assert combined["manifestVersion"] == int(base["manifestVersion"]) + 2
+          assert Path("manifests/production.json").read_text() == Path("manifests/production.json").read_text()
+          print("Gate A models", len(combined["models"]), "manifestVersion", combined["manifestVersion"])
+          print("manifestDigest", combined["manifestDigest"])
+          PY
+
+      - name: Publish/update combined prerelease manifest only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="candidate-stage16b-vad-gate-a-r1"
+          asset="dist/production.json"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$asset" --clobber
+          else
+            gh release create "$tag" \
+              "$asset" \
+              --prerelease \
+              --title "Candidate: Stage 16B VAD Gate A r1" \
+              --notes "QA-only combined manifest for same-device Silero vs FSMN-VAD vs TEN-VAD Gate A benchmarking. It is generated from immutable production manifest v7 plus the already-verified FSMN and TEN candidate descriptors. Production manifest is unchanged and no production promotion is authorized."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage16b-vad-gate-a-candidate-r1
+          path: dist/production.json
+          retention-days: 1
