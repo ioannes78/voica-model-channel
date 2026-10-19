@@ -1,0 +1,67 @@
+name: Stage 16B FunASR Nano Candidate
+
+on:
+  push:
+    branches:
+      - stage16b-funasr-nano-candidate
+    paths:
+      - "scripts/prepare-official-model.py"
+      - ".github/workflows/stage16b-funasr-nano-candidate.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage16b-funasr-nano-candidate
+  cancel-in-progress: true
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify candidate tooling syntax
+        run: python3 -m py_compile scripts/prepare-official-model.py scripts/upsert_model.py scripts/validate_manifest.py
+
+      - name: Download, verify, and describe official FunASR Nano INT8 package
+        run: python3 scripts/prepare-official-model.py funasr-nano 1 dist
+
+      - name: Build candidate manifest from immutable production baseline
+        run: |
+          python3 scripts/upsert_model.py \
+            manifests/production.json \
+            dist/model-descriptor.json \
+            dist/production.json
+          python3 scripts/validate_manifest.py dist/production.json
+
+      - name: Publish/update prerelease candidate manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="candidate-funasr-nano-r1"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" \
+              dist/model-descriptor.json \
+              dist/production.json \
+              --clobber
+          else
+            gh release create "$tag" \
+              dist/model-descriptor.json \
+              dist/production.json \
+              --prerelease \
+              --title "Candidate: Fun-ASR-Nano INT8 r1" \
+              --notes "Stage 16B candidate manifest only. Production manifest is unchanged. Do not promote until Android package/file verification, isolated native runtime validation, real-device transcription QA, benchmark gates, and explicit user authorization pass."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage16b-funasr-nano-candidate-r1
+          path: |
+            dist/model-descriptor.json
+            dist/production.json
+          retention-days: 1
