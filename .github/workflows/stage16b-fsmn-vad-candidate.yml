@@ -1,0 +1,100 @@
+name: Stage 16B FSMN VAD Candidate
+
+on:
+  push:
+    branches:
+      - stage16b-fsmn-vad-candidate
+    paths:
+      - "scripts/prepare-stage16b-fsmn-vad.py"
+      - ".github/workflows/stage16b-fsmn-vad-candidate.yml"
+      - "scripts/upsert_model.py"
+      - "scripts/validate_manifest.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage16b-fsmn-vad-candidate
+  cancel-in-progress: true
+
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify candidate tooling syntax
+        run: |
+          python3 -m py_compile \
+            scripts/prepare-stage16b-fsmn-vad.py \
+            scripts/upsert_model.py \
+            scripts/validate_manifest.py
+
+      - name: Download, verify, and package pinned FSMN VAD INT8 assets
+        run: python3 scripts/prepare-stage16b-fsmn-vad.py dist
+
+      - name: Build candidate manifest from immutable production baseline
+        run: |
+          python3 scripts/upsert_model.py \
+            manifests/production.json \
+            dist/model-descriptor.json \
+            dist/production.json
+          python3 scripts/validate_manifest.py dist/production.json
+
+      - name: Verify generated candidate package and descriptor agree
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import pathlib
+
+          root = pathlib.Path("dist")
+          metadata = json.loads((root / "package-metadata.json").read_text())
+          descriptor = json.loads((root / "model-descriptor.json").read_text())
+          package = root / metadata["packageName"]
+          digest = hashlib.sha256(package.read_bytes()).hexdigest()
+          assert package.stat().st_size == metadata["packageSizeBytes"]
+          assert digest == metadata["packageSha256"]
+          assert descriptor["download"]["sizeBytes"] == metadata["packageSizeBytes"]
+          assert descriptor["download"]["sha256"] == metadata["packageSha256"]
+          assert descriptor["runtimeId"] == "voica-fsmn-ort"
+          assert descriptor["runtimeVersionMin"] == "1.0.0"
+          assert descriptor["modelId"] == "fsmn-vad-int8"
+          PY
+
+      - name: Publish/update prerelease candidate package and manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="candidate-fsmn-vad-r1"
+          assets=(
+            dist/fsmn-vad-int8-r1.tar.bz2
+            dist/model-descriptor.json
+            dist/package-metadata.json
+            dist/production.json
+          )
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "${assets[@]}" --clobber
+          else
+            gh release create "$tag" \
+              "${assets[@]}" \
+              --prerelease \
+              --title "Candidate: FSMN VAD INT8 r1" \
+              --notes "Stage 16B VAD candidate only. Production manifest is unchanged. Do not promote until Android package/file verification, isolated native runtime validation, real-device VAD QA, VAD Matrix Gate A, and explicit user authorization pass."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage16b-fsmn-vad-candidate-r1
+          path: |
+            dist/fsmn-vad-int8-r1.tar.bz2
+            dist/model-descriptor.json
+            dist/package-metadata.json
+            dist/production.json
+          retention-days: 1
