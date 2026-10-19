@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import hashlib
 import json
-import os
 import pathlib
 import shutil
 import sys
@@ -45,7 +44,56 @@ MODELS = {
         },
         "attribution": "k2-fsa SenseVoice int8 2024-07-17",
     },
+    "funasr-nano": {
+        "modelId": "funasr-nano-int8",
+        "kind": "ASR_LARGE",
+        "displayName": "Fun-ASR-Nano INT8",
+        "version": "2025-12-30",
+        "revision": 1,
+        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-funasr-nano-int8-2025-12-30.tar.bz2",
+        "size": 841730611,
+        "sha": "eb43d7ccc2e86b243f6a03b7df361033dda66db9523d1a92bf6aca2b50c9476b",
+        "root": "sherpa-onnx-funasr-nano-int8-2025-12-30",
+        "files": [
+            ("encoder_adaptor.int8.onnx", "encoder_adaptor.int8.onnx"),
+            ("llm.int8.onnx", "llm.int8.onnx"),
+            ("embedding.int8.onnx", "embedding.int8.onnx"),
+            ("Qwen3-0.6B/merges.txt", "Qwen3-0.6B/merges.txt"),
+            ("Qwen3-0.6B/tokenizer.json", "Qwen3-0.6B/tokenizer.json"),
+            ("Qwen3-0.6B/vocab.json", "Qwen3-0.6B/vocab.json"),
+        ],
+        "languages": ["zh", "en", "ja"],
+        "capabilities": {
+            "supportsTokenTiming": False,
+            "supportsLanguageDetection": False,
+            "supportsInverseTextNormalization": True,
+            "supportsSecondPass": True,
+            "supportsHotwords": True,
+            "executionMode": "OFFLINE",
+            "timestampCapability": "NONE",
+            "supportsLanguageForcing": True,
+            "punctuationMode": "NATIVE",
+            "supportedParameters": [
+                "numThreads",
+                "maxNewTokens",
+                "temperature",
+                "topP",
+                "seed",
+                "language",
+                "itn",
+                "hotwords",
+            ],
+        },
+        "runtimeModelType": "funasr-nano",
+        "quantization": "INT8",
+        "appVersionMin": 92,
+        "licenseId": "Apache-2.0",
+        "licenseUrl": "https://huggingface.co/FunAudioLLM/Fun-ASR-Nano-2512",
+        "homepage": "https://k2-fsa.github.io/sherpa/onnx/funasr-nano/pretrained.html",
+        "attribution": "FunAudioLLM Fun-ASR-Nano-2512; k2-fsa sherpa-onnx INT8 conversion 2025-12-30",
+    },
 }
+
 
 def sha256(path: pathlib.Path) -> str:
     h = hashlib.sha256()
@@ -54,8 +102,11 @@ def sha256(path: pathlib.Path) -> str:
             h.update(chunk)
     return h.hexdigest()
 
+
 if len(sys.argv) != 4:
-    raise SystemExit("usage: prepare-official-model.py punctuation|sensevoice REVISION OUT_DIR")
+    raise SystemExit(
+        "usage: prepare-official-model.py punctuation|sensevoice|funasr-nano REVISION OUT_DIR"
+    )
 key, revision_text, out_text = sys.argv[1:]
 if key not in MODELS:
     raise SystemExit("unknown model: " + key)
@@ -139,22 +190,33 @@ descriptor = {
     "compatibility": {
         "abis": ["arm64-v8a"],
         "minSdk": 26,
-        "appVersionMin": 20,
+        "appVersionMin": cfg.get("appVersionMin", 20),
         "appVersionMax": None,
     },
     "license": {
-        "id": "Apache-2.0",
-        "url": "https://github.com/k2-fsa/sherpa-onnx/blob/master/LICENSE",
+        "id": cfg.get("licenseId", "Apache-2.0"),
+        "url": cfg.get(
+            "licenseUrl",
+            "https://github.com/k2-fsa/sherpa-onnx/blob/master/LICENSE",
+        ),
         "attribution": cfg["attribution"],
         "redistributionPolicy": "UPSTREAM_ONLY",
     },
     "sourceUrl": cfg["url"],
-    "homepage": "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/index.html",
+    "homepage": cfg.get(
+        "homepage",
+        "https://k2-fsa.github.io/sherpa/onnx/pretrained_models/index.html",
+    ),
     "releaseChannel": "production",
     "autoUpdateEligible": False,
     "deprecated": False,
     "criticalUpdate": False,
 }
+if cfg.get("runtimeModelType"):
+    descriptor["runtimeModelType"] = cfg["runtimeModelType"]
+if cfg.get("quantization"):
+    descriptor["quantization"] = cfg["quantization"]
+
 (out / "model-descriptor.json").write_text(
     json.dumps(descriptor, ensure_ascii=False, indent=2) + "\n",
     encoding="utf-8",
