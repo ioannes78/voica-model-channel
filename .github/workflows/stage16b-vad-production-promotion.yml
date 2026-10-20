@@ -28,6 +28,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Always regenerate from the current production v7 baseline on main so a previous
+          # staged TEN descriptor cannot leak into the revised production decision.
+          git show origin/main:manifests/production.json > manifests/production.json
+
           python3 - <<'PY'
           import datetime
           import hashlib
@@ -104,68 +108,8 @@ jobs:
               "quantization": "INT8",
           }
 
-          ten = {
-              "modelId": "ten-vad-fp32",
-              "kind": "VAD",
-              "displayName": "TEN VAD FP32",
-              "version": "2025-07-11",
-              "revision": 1,
-              "runtimeId": "sherpa-onnx",
-              "runtimeVersionMin": "1.13.8",
-              "runtimeVersionMax": "1.13.8",
-              "languages": ["und"],
-              "capabilities": {
-                  "supportsStreaming": True,
-                  "supportsPartial": False,
-                  "supportsTokenTiming": False,
-                  "supportsLanguageDetection": False,
-                  "supportsConfidence": False,
-                  "supportsInverseTextNormalization": False,
-                  "supportsSecondPass": False,
-                  "supportsHotwords": False,
-              },
-              "sourceType": "MANAGED_DOWNLOAD",
-              "builtinAssetPath": None,
-              "download": {
-                  "packageFormat": "SINGLE_FILE",
-                  "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/ten-vad.onnx",
-                  "mirrors": [],
-                  "sizeBytes": 332211,
-                  "sha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206",
-              },
-              "installedSizeBytes": 332211,
-              "files": [
-                  {
-                      "relativePath": "ten-vad.onnx",
-                      "sizeBytes": 332211,
-                      "sha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206",
-                      "packagePath": "ten-vad.onnx",
-                  }
-              ],
-              "compatibility": {
-                  "abis": ["arm64-v8a"],
-                  "minSdk": 26,
-                  "appVersionMin": 92,
-                  "appVersionMax": None,
-              },
-              "license": {
-                  "id": "TEN-VAD-Open-Source-License",
-                  "url": "https://github.com/TEN-framework/ten-vad/blob/main/LICENSE",
-                  "attribution": "TEN VAD; sherpa-onnx official release asset. Apache-2.0 with TEN-VAD additional deployment conditions; production merge remains gated on license applicability review.",
-                  "redistributionPolicy": "UPSTREAM_ONLY",
-              },
-              "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/ten-vad.onnx",
-              "homepage": "https://github.com/TEN-framework/ten-vad",
-              "releaseChannel": "production",
-              "autoUpdateEligible": False,
-              "deprecated": False,
-              "criticalUpdate": False,
-              "quantization": "FP32",
-          }
-
           by_id = {model["modelId"]: model for model in data["models"]}
           by_id[fsmn["modelId"]] = fsmn
-          by_id[ten["modelId"]] = ten
           models = [by_id[key] for key in sorted(by_id)]
 
           data["manifestVersion"] = 8
@@ -191,5 +135,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add manifests/production.json
-          git commit -m "feat(stage16b): stage FSMN and TEN VAD production manifest"
+          git commit -m "feat(stage16b): stage FSMN VAD production manifest"
           git push origin HEAD:stage16b-vad-production-promotion
