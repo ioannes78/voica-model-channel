@@ -2,8 +2,8 @@
   "catalogVersion": 1,
   "manifestVersion": 8,
   "channel": "production",
-  "publishedAt": "2026-10-20T00:41:42Z",
-  "manifestDigest": "d697f47d24c8beb9c610358f39b79f75073469315ce19d920e697b99abf167e8",
+  "publishedAt": "2026-10-20T04:39:45Z",
+  "manifestDigest": "05dcd9f205a3383c2bda0704996b85e741384daa9c2e8a63ff132b74b5424d37",
   "signature": null,
   "keyId": null,
   "models": [
@@ -564,68 +564,6 @@
       "autoUpdateEligible": true,
       "deprecated": false,
       "criticalUpdate": false
-    },
-    {
-      "modelId": "ten-vad-fp32",
-      "kind": "VAD",
-      "displayName": "TEN VAD FP32",
-      "version": "2025-07-11",
-      "revision": 1,
-      "runtimeId": "sherpa-onnx",
-      "runtimeVersionMin": "1.13.8",
-      "runtimeVersionMax": "1.13.8",
-      "languages": [
-        "und"
-      ],
-      "capabilities": {
-        "supportsStreaming": true,
-        "supportsPartial": false,
-        "supportsTokenTiming": false,
-        "supportsLanguageDetection": false,
-        "supportsConfidence": false,
-        "supportsInverseTextNormalization": false,
-        "supportsSecondPass": false,
-        "supportsHotwords": false
-      },
-      "sourceType": "MANAGED_DOWNLOAD",
-      "builtinAssetPath": null,
-      "download": {
-        "packageFormat": "SINGLE_FILE",
-        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/ten-vad.onnx",
-        "mirrors": [],
-        "sizeBytes": 332211,
-        "sha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206"
-      },
-      "installedSizeBytes": 332211,
-      "files": [
-        {
-          "relativePath": "ten-vad.onnx",
-          "sizeBytes": 332211,
-          "sha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206",
-          "packagePath": "ten-vad.onnx"
-        }
-      ],
-      "compatibility": {
-        "abis": [
-          "arm64-v8a"
-        ],
-        "minSdk": 26,
-        "appVersionMin": 92,
-        "appVersionMax": null
-      },
-      "license": {
-        "id": "TEN-VAD-Open-Source-License",
-        "url": "https://github.com/TEN-framework/ten-vad/blob/main/LICENSE",
-        "attribution": "TEN VAD; sherpa-onnx official release asset. Apache-2.0 with TEN-VAD additional deployment conditions; production merge remains gated on license applicability review.",
-        "redistributionPolicy": "UPSTREAM_ONLY"
-      },
-      "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/ten-vad.onnx",
-      "homepage": "https://github.com/TEN-framework/ten-vad",
-      "releaseChannel": "production",
-      "autoUpdateEligible": false,
-      "deprecated": false,
-      "criticalUpdate": false,
-      "quantization": "FP32"
     },
     {
       "modelId": "zipformer-large-zh-ctc-int8",
