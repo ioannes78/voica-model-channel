@@ -1,0 +1,195 @@
+name: Stage 16B VAD Production Promotion
+
+on:
+  push:
+    branches:
+      - stage16b-vad-production-promotion
+    paths:
+      - ".github/workflows/stage16b-vad-production-promotion.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage16b-vad-production-promotion
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build production manifest v8 candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime
+          import hashlib
+          import json
+          import pathlib
+
+          path = pathlib.Path("manifests/production.json")
+          data = json.loads(path.read_text(encoding="utf-8"))
+          assert data["manifestVersion"] == 7
+          assert data["manifestDigest"] == "8bdb505ce97820cb942bc2855c8a099484b7e22f63ec5567b63f2c1c18d567cf"
+
+          fsmn = {
+              "modelId": "fsmn-vad-int8",
+              "kind": "VAD",
+              "displayName": "FSMN VAD INT8",
+              "version": "1.0.0",
+              "revision": 1,
+              "runtimeId": "voica-fsmn-ort",
+              "runtimeVersionMin": "1.0.0",
+              "runtimeVersionMax": None,
+              "languages": ["und"],
+              "capabilities": {
+                  "supportsStreaming": False,
+                  "supportsPartial": False,
+                  "supportsTokenTiming": False,
+                  "supportsLanguageDetection": False,
+                  "supportsConfidence": False,
+                  "supportsInverseTextNormalization": False,
+                  "supportsSecondPass": False,
+                  "supportsHotwords": False,
+              },
+              "sourceType": "MANAGED_DOWNLOAD",
+              "builtinAssetPath": None,
+              "download": {
+                  "packageFormat": "TAR_BZ2",
+                  "url": "https://github.com/ioannes78/voica-model-channel/releases/download/candidate-fsmn-vad-r1/fsmn-vad-int8-r1.tar.bz2",
+                  "mirrors": [],
+                  "sizeBytes": 478102,
+                  "sha256": "719be2c2243b11069f6701fb6c478ffd1dc4f342d93753c438a0f13c7e4769e8",
+              },
+              "installedSizeBytes": 516916,
+              "files": [
+                  {
+                      "relativePath": "model_quant.onnx",
+                      "sizeBytes": 508876,
+                      "sha256": "9b28837838fce9685503c63139fadbad35d6c8ed485485dafdbb32e725969660",
+                      "packagePath": "fsmn-vad-int8-r1/model_quant.onnx",
+                  },
+                  {
+                      "relativePath": "vad.mvn",
+                      "sizeBytes": 8040,
+                      "sha256": "6820fef9687708c4fc3fab2530179c8fcea6262daa25514380056cd8f6eb1754",
+                      "packagePath": "fsmn-vad-int8-r1/vad.mvn",
+                  },
+              ],
+              "compatibility": {
+                  "abis": ["arm64-v8a"],
+                  "minSdk": 26,
+                  "appVersionMin": 92,
+                  "appVersionMax": None,
+              },
+              "license": {
+                  "id": "Apache-2.0",
+                  "url": "https://www.apache.org/licenses/LICENSE-2.0",
+                  "attribution": "FunASR FSMN-VAD ONNX INT8; upstream revision eeb66f413b94a33458f7edbe7f501b10f20fcc85",
+                  "redistributionPolicy": "VOICA_MIRROR_ALLOWED",
+              },
+              "sourceUrl": "https://huggingface.co/funasr/fsmn-vad-onnx/tree/eeb66f413b94a33458f7edbe7f501b10f20fcc85",
+              "homepage": "https://huggingface.co/funasr/fsmn-vad-onnx",
+              "releaseChannel": "production",
+              "autoUpdateEligible": False,
+              "deprecated": False,
+              "criticalUpdate": False,
+              "quantization": "INT8",
+          }
+
+          ten = {
+              "modelId": "ten-vad-fp32",
+              "kind": "VAD",
+              "displayName": "TEN VAD FP32",
+              "version": "2025-07-11",
+              "revision": 1,
+              "runtimeId": "sherpa-onnx",
+              "runtimeVersionMin": "1.13.8",
+              "runtimeVersionMax": "1.13.8",
+              "languages": ["und"],
+              "capabilities": {
+                  "supportsStreaming": True,
+                  "supportsPartial": False,
+                  "supportsTokenTiming": False,
+                  "supportsLanguageDetection": False,
+                  "supportsConfidence": False,
+                  "supportsInverseTextNormalization": False,
+                  "supportsSecondPass": False,
+                  "supportsHotwords": False,
+              },
+              "sourceType": "MANAGED_DOWNLOAD",
+              "builtinAssetPath": None,
+              "download": {
+                  "packageFormat": "SINGLE_FILE",
+                  "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/ten-vad.onnx",
+                  "mirrors": [],
+                  "sizeBytes": 332211,
+                  "sha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206",
+              },
+              "installedSizeBytes": 332211,
+              "files": [
+                  {
+                      "relativePath": "ten-vad.onnx",
+                      "sizeBytes": 332211,
+                      "sha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206",
+                      "packagePath": "ten-vad.onnx",
+                  }
+              ],
+              "compatibility": {
+                  "abis": ["arm64-v8a"],
+                  "minSdk": 26,
+                  "appVersionMin": 92,
+                  "appVersionMax": None,
+              },
+              "license": {
+                  "id": "TEN-VAD-Open-Source-License",
+                  "url": "https://github.com/TEN-framework/ten-vad/blob/main/LICENSE",
+                  "attribution": "TEN VAD; sherpa-onnx official release asset. Apache-2.0 with TEN-VAD additional deployment conditions; production merge remains gated on license applicability review.",
+                  "redistributionPolicy": "UPSTREAM_ONLY",
+              },
+              "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/ten-vad.onnx",
+              "homepage": "https://github.com/TEN-framework/ten-vad",
+              "releaseChannel": "production",
+              "autoUpdateEligible": False,
+              "deprecated": False,
+              "criticalUpdate": False,
+              "quantization": "FP32",
+          }
+
+          by_id = {model["modelId"]: model for model in data["models"]}
+          by_id[fsmn["modelId"]] = fsmn
+          by_id[ten["modelId"]] = ten
+          models = [by_id[key] for key in sorted(by_id)]
+
+          data["manifestVersion"] = 8
+          data["publishedAt"] = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+          data["models"] = models
+          data["manifestDigest"] = hashlib.sha256(
+              json.dumps(models, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+          ).hexdigest()
+
+          path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+          PY
+
+          python3 scripts/validate_manifest.py manifests/production.json
+
+      - name: Commit generated promotion manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- manifests/production.json; then
+            echo "No manifest change"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifests/production.json
+          git commit -m "feat(stage16b): stage FSMN and TEN VAD production manifest"
+          git push origin HEAD:stage16b-vad-production-promotion
