@@ -1,9 +1,9 @@
 {
   "catalogVersion": 1,
-  "manifestVersion": 7,
+  "manifestVersion": 8,
   "channel": "production",
-  "publishedAt": "2026-10-06T21:11:37Z",
-  "manifestDigest": "8bdb505ce97820cb942bc2855c8a099484b7e22f63ec5567b63f2c1c18d567cf",
+  "publishedAt": "2026-10-20T00:41:42Z",
+  "manifestDigest": "d697f47d24c8beb9c610358f39b79f75073469315ce19d920e697b99abf167e8",
   "signature": null,
   "keyId": null,
   "models": [
@@ -192,6 +192,74 @@
       "autoUpdateEligible": false,
       "deprecated": false,
       "criticalUpdate": false
+    },
+    {
+      "modelId": "fsmn-vad-int8",
+      "kind": "VAD",
+      "displayName": "FSMN VAD INT8",
+      "version": "1.0.0",
+      "revision": 1,
+      "runtimeId": "voica-fsmn-ort",
+      "runtimeVersionMin": "1.0.0",
+      "runtimeVersionMax": null,
+      "languages": [
+        "und"
+      ],
+      "capabilities": {
+        "supportsStreaming": false,
+        "supportsPartial": false,
+        "supportsTokenTiming": false,
+        "supportsLanguageDetection": false,
+        "supportsConfidence": false,
+        "supportsInverseTextNormalization": false,
+        "supportsSecondPass": false,
+        "supportsHotwords": false
+      },
+      "sourceType": "MANAGED_DOWNLOAD",
+      "builtinAssetPath": null,
+      "download": {
+        "packageFormat": "TAR_BZ2",
+        "url": "https://github.com/ioannes78/voica-model-channel/releases/download/candidate-fsmn-vad-r1/fsmn-vad-int8-r1.tar.bz2",
+        "mirrors": [],
+        "sizeBytes": 478102,
+        "sha256": "719be2c2243b11069f6701fb6c478ffd1dc4f342d93753c438a0f13c7e4769e8"
+      },
+      "installedSizeBytes": 516916,
+      "files": [
+        {
+          "relativePath": "model_quant.onnx",
+          "sizeBytes": 508876,
+          "sha256": "9b28837838fce9685503c63139fadbad35d6c8ed485485dafdbb32e725969660",
+          "packagePath": "fsmn-vad-int8-r1/model_quant.onnx"
+        },
+        {
+          "relativePath": "vad.mvn",
+          "sizeBytes": 8040,
+          "sha256": "6820fef9687708c4fc3fab2530179c8fcea6262daa25514380056cd8f6eb1754",
+          "packagePath": "fsmn-vad-int8-r1/vad.mvn"
+        }
+      ],
+      "compatibility": {
+        "abis": [
+          "arm64-v8a"
+        ],
+        "minSdk": 26,
+        "appVersionMin": 92,
+        "appVersionMax": null
+      },
+      "license": {
+        "id": "Apache-2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0",
+        "attribution": "FunASR FSMN-VAD ONNX INT8; upstream revision eeb66f413b94a33458f7edbe7f501b10f20fcc85",
+        "redistributionPolicy": "VOICA_MIRROR_ALLOWED"
+      },
+      "sourceUrl": "https://huggingface.co/funasr/fsmn-vad-onnx/tree/eeb66f413b94a33458f7edbe7f501b10f20fcc85",
+      "homepage": "https://huggingface.co/funasr/fsmn-vad-onnx",
+      "releaseChannel": "production",
+      "autoUpdateEligible": false,
+      "deprecated": false,
+      "criticalUpdate": false,
+      "quantization": "INT8"
     },
     {
       "modelId": "pyannote-segmentation-3-int8",
@@ -496,6 +564,68 @@
       "autoUpdateEligible": true,
       "deprecated": false,
       "criticalUpdate": false
+    },
+    {
+      "modelId": "ten-vad-fp32",
+      "kind": "VAD",
+      "displayName": "TEN VAD FP32",
+      "version": "2025-07-11",
+      "revision": 1,
+      "runtimeId": "sherpa-onnx",
+      "runtimeVersionMin": "1.13.8",
+      "runtimeVersionMax": "1.13.8",
+      "languages": [
+        "und"
+      ],
+      "capabilities": {
+        "supportsStreaming": true,
+        "supportsPartial": false,
+        "supportsTokenTiming": false,
+        "supportsLanguageDetection": false,
+        "supportsConfidence": false,
+        "supportsInverseTextNormalization": false,
+        "supportsSecondPass": false,
+        "supportsHotwords": false
+      },
+      "sourceType": "MANAGED_DOWNLOAD",
+      "builtinAssetPath": null,
+      "download": {
+        "packageFormat": "SINGLE_FILE",
+        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/ten-vad.onnx",
+        "mirrors": [],
+        "sizeBytes": 332211,
+        "sha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206"
+      },
+      "installedSizeBytes": 332211,
+      "files": [
+        {
+          "relativePath": "ten-vad.onnx",
+          "sizeBytes": 332211,
+          "sha256": "718cb7eef47e3cf5ddbe7e967a7503f46b8b469c0706872f494dfa921b486206",
+          "packagePath": "ten-vad.onnx"
+        }
+      ],
+      "compatibility": {
+        "abis": [
+          "arm64-v8a"
+        ],
+        "minSdk": 26,
+        "appVersionMin": 92,
+        "appVersionMax": null
+      },
+      "license": {
+        "id": "TEN-VAD-Open-Source-License",
+        "url": "https://github.com/TEN-framework/ten-vad/blob/main/LICENSE",
+        "attribution": "TEN VAD; sherpa-onnx official release asset. Apache-2.0 with TEN-VAD additional deployment conditions; production merge remains gated on license applicability review.",
+        "redistributionPolicy": "UPSTREAM_ONLY"
+      },
+      "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/ten-vad.onnx",
+      "homepage": "https://github.com/TEN-framework/ten-vad",
+      "releaseChannel": "production",
+      "autoUpdateEligible": false,
+      "deprecated": false,
+      "criticalUpdate": false,
+      "quantization": "FP32"
     },
     {
       "modelId": "zipformer-large-zh-ctc-int8",
