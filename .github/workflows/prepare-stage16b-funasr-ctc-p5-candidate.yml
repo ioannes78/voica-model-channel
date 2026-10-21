@@ -1,0 +1,234 @@
+name: Prepare Stage 16B FunASR CTC P5 Candidate
+
+on:
+  push:
+    branches: [ stage16b-funasr-ctc-p5-qa ]
+    paths:
+      - ".github/workflows/prepare-stage16b-funasr-ctc-p5-candidate.yml"
+      - "scripts/build-funasr-ctc-p5-candidate.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage16b-funasr-ctc-p5-candidate
+  cancel-in-progress: true
+
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      VOICA_H2_REF: "d9ed0d634b4a973bcc3b31a8dbf99e980124eb05"
+      BASE_V9_REF: "eeb59214244f392f3e2eecdb90016efbe3a95401"
+      RELEASE_TAG: "candidate-stage16b-funasr-ctc-p5-r1"
+      FUNASR_REFERENCE_COMMIT: "24217c8ff0b81f3d967593f0bf84609306929f99"
+      LEGACY_EXPORTER_COMMIT: "6823a8ed9f4a0393750d54d750051cf5a51a7fa9"
+      H2_DESKTOP_ORT_VERSION: "1.28.0"
+      MODELSCOPE_DOWNLOAD_PARALLEL_WORKERS: "4"
+      MODELSCOPE_DOWNLOAD_PARALLEL_THRESHOLD_MB: "500"
+      MODELSCOPE_DOWNLOAD_PART_SIZE_MB: "160"
+
+    steps:
+      - name: Checkout model channel QA branch
+        uses: actions/checkout@v5
+
+      - name: Checkout immutable Voica H2 gate sources
+        uses: actions/checkout@v5
+        with:
+          repository: ioannes78/voica-android
+          ref: ${{ env.VOICA_H2_REF }}
+          path: voica-android
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install pinned H2 tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --no-cache-dir \
+            "modelscope-hub==0.4.6" \
+            "tiktoken==0.12.0" \
+            "PyYAML==6.0.2" \
+            "onnx==1.18.0" \
+            "onnxruntime==${H2_DESKTOP_ORT_VERSION}" \
+            "ml_dtypes==0.5.4"
+          python -m pip install --disable-pip-version-check --no-cache-dir \
+            --index-url https://download.pytorch.org/whl/cpu \
+            "torch==2.7.1" \
+            "torchaudio==2.7.1"
+
+      - name: Checkout pinned FunASR reference and revision-1 exporter
+        shell: bash
+        run: |
+          set -euo pipefail
+          funasr="${RUNNER_TEMP}/FunASR-reference"
+          exporter="${RUNNER_TEMP}/FunASR-nano-onnx"
+          git init "$funasr"
+          git -C "$funasr" remote add origin https://github.com/modelscope/FunASR.git
+          git -C "$funasr" fetch --depth=1 origin "$FUNASR_REFERENCE_COMMIT"
+          git -C "$funasr" checkout --detach FETCH_HEAD
+          test "$(git -C "$funasr" rev-parse HEAD)" = "$FUNASR_REFERENCE_COMMIT"
+          git init "$exporter"
+          git -C "$exporter" remote add origin https://github.com/Wasser1462/FunASR-nano-onnx.git
+          git -C "$exporter" fetch --depth=1 origin "$LEGACY_EXPORTER_COMMIT"
+          git -C "$exporter" checkout --detach FETCH_HEAD
+          test "$(git -C "$exporter" rev-parse HEAD)" = "$LEGACY_EXPORTER_COMMIT"
+
+      - name: Regenerate H2a FP32 compact scorer
+        shell: bash
+        run: |
+          set -euo pipefail
+          python voica-android/ci/funasr-ctc-a3-h2/verify-h2a-ctc-export.py \
+            --out "${RUNNER_TEMP}/funasr-a3-h2a" \
+            --funasr-root "${RUNNER_TEMP}/FunASR-reference"
+
+      - name: Regenerate H2b dual-output encoder
+        shell: bash
+        run: |
+          set -euo pipefail
+          python voica-android/ci/funasr-ctc-a3-h2/verify-h2b-dual-encoder.py \
+            --source-root "${RUNNER_TEMP}/funasr-a3-h2a" \
+            --exporter-root "${RUNNER_TEMP}/FunASR-nano-onnx" \
+            --out "${RUNNER_TEMP}/funasr-a3-h2b"
+
+      - name: Regenerate exact production INT8 dual-output encoder
+        shell: bash
+        run: |
+          set -euo pipefail
+          python voica-android/ci/funasr-ctc-a3-h2/verify-h2c-int8-dual-surgery.py \
+            --h2b-root "${RUNNER_TEMP}/funasr-a3-h2b" \
+            --out "${RUNNER_TEMP}/funasr-a3-h2c"
+
+      - name: Install pinned generation dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --no-cache-dir \
+            "transformers==4.57.3" \
+            "kaldi-native-fbank==1.22.3" \
+            "soundfile==0.13.1"
+
+      - name: Re-prove revision-1 to dual-output LLM parity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python voica-android/ci/funasr-ctc-a3-h2/verify-h2c-generation-parity.py \
+            --h2c-root "${RUNNER_TEMP}/funasr-a3-h2c" \
+            --exporter-root "${RUNNER_TEMP}/FunASR-nano-onnx" \
+            --out "${RUNNER_TEMP}/funasr-a3-h2c-generation"
+
+      - name: Regenerate canonical mixed INT8 CTC scorer
+        shell: bash
+        run: |
+          set -euo pipefail
+          python voica-android/ci/funasr-ctc-a3-h2/select-h2d-mixed-int8.py \
+            --h2a-root "${RUNNER_TEMP}/funasr-a3-h2a" \
+            --h2c-root "${RUNNER_TEMP}/funasr-a3-h2c" \
+            --h2c-generation-root "${RUNNER_TEMP}/funasr-a3-h2c-generation" \
+            --exporter-root "${RUNNER_TEMP}/FunASR-nano-onnx" \
+            --funasr-root "${RUNNER_TEMP}/FunASR-reference" \
+            --out "${RUNNER_TEMP}/funasr-a3-h2d"
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          p = Path(__import__('os').environ['RUNNER_TEMP']) / 'funasr-a3-h2d' / 'ctc_compact.int8.onnx'
+          h = hashlib.sha256(p.read_bytes()).hexdigest()
+          assert p.stat().st_size == 54235091, p.stat().st_size
+          assert h == 'db93af357c1d5ba78e9516950fd8931ead11666ffa00b1928e2fda9e8003bc38', h
+          PY
+
+      - name: Fetch immutable staged v9 base manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 4 \
+            "https://raw.githubusercontent.com/ioannes78/voica-model-channel/${BASE_V9_REF}/manifests/production.json" \
+            -o "${RUNNER_TEMP}/production-v9.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          data = json.loads((Path(os.environ['RUNNER_TEMP']) / 'production-v9.json').read_text())
+          assert data['manifestVersion'] == 9
+          assert data['manifestDigest'] == 'a49da9fdf2dabf2408ba2bb14cf6b5c25c35563052cc6307db8f8095caac0b45'
+          f = [m for m in data['models'] if m['modelId'] == 'funasr-nano-int8']
+          assert len(f) == 1 and f[0]['revision'] == 1
+          PY
+
+      - name: Build revision-2 QA package and descriptor
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/build-funasr-ctc-p5-candidate.py \
+            --h2a-root "${RUNNER_TEMP}/funasr-a3-h2a" \
+            --h2c-root "${RUNNER_TEMP}/funasr-a3-h2c" \
+            --h2d-root "${RUNNER_TEMP}/funasr-a3-h2d" \
+            --base-manifest "${RUNNER_TEMP}/production-v9.json" \
+            --dist dist \
+            --release-tag "$RELEASE_TAG"
+
+      - name: Generate and validate candidate manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/upsert_model.py \
+            "${RUNNER_TEMP}/production-v9.json" \
+            dist/model-descriptor.json \
+            dist/production.json
+          python scripts/validate_manifest.py dist/production.json
+          python - <<'PY'
+          import json
+          d = json.load(open('dist/model-descriptor.json', encoding='utf-8'))
+          assert d['revision'] == 2
+          assert d['capabilities']['supportsTokenTiming'] is True
+          assert d['capabilities']['timestampCapability'] == 'TOKEN'
+          files = {x['relativePath']: x for x in d['files']}
+          assert files['encoder_adaptor.int8.onnx']['sha256'] == 'd5bb172a133fc4f996ede12cab43c0b9b4bcbb2922c1f967794505b9549b6d85'
+          assert files['ctc_compact.int8.onnx']['sha256'] == 'db93af357c1d5ba78e9516950fd8931ead11666ffa00b1928e2fda9e8003bc38'
+          assert files['multilingual.tiktoken']['sha256'] == '747979631e813193436aabcff7c1c235d37de8097b71c563ec8b63b7a515c718'
+          c = json.load(open('dist/production.json', encoding='utf-8'))
+          assert c['manifestVersion'] == 10
+          f = [m for m in c['models'] if m['modelId'] == 'funasr-nano-int8']
+          assert len(f) == 1 and f[0]['revision'] == 2
+          PY
+
+      - name: Publish isolated P5 QA prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          assets=(
+            dist/voica-funasr-nano-int8-2025-12-30-r2.tar.bz2
+            dist/model-descriptor.json
+            dist/package-metadata.json
+            dist/production.json
+          )
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "${assets[@]}" --clobber
+          else
+            gh release create "$RELEASE_TAG" "${assets[@]}" \
+              --target "$GITHUB_SHA" \
+              --prerelease \
+              --title "Candidate: Stage 16B FunASR native CTC P5 r1" \
+              --notes "QA-only revision-2 FunASR candidate generated from immutable H2 PASS sources. It preserves the staged revision-1 LLM/embedding/tokenizer assets, replaces only the verified dual-output encoder, and adds the verified compact CTC scorer plus model-owned multilingual.tiktoken metadata. Production manifest v9 and PR #21 are unchanged. Do not promote without Android arm64 real-device P5 acceptance."
+          fi
+
+      - name: Remove large runner-local assets
+        if: always()
+        shell: bash
+        run: |
+          rm -rf \
+            "${RUNNER_TEMP}/funasr-a3-h2a" \
+            "${RUNNER_TEMP}/funasr-a3-h2b" \
+            "${RUNNER_TEMP}/funasr-a3-h2c" \
+            "${RUNNER_TEMP}/funasr-a3-h2c-generation" \
+            "${RUNNER_TEMP}/funasr-a3-h2d" \
+            "${RUNNER_TEMP}/FunASR-reference" \
+            "${RUNNER_TEMP}/FunASR-nano-onnx" \
+            dist/work \
+            dist/voica-funasr-nano-int8-2025-12-30-r2.tar.bz2
+          df -h . "${RUNNER_TEMP}"
