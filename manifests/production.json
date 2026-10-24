@@ -1,9 +1,9 @@
 {
   "catalogVersion": 1,
-  "manifestVersion": 9,
+  "manifestVersion": 10,
   "channel": "production",
-  "publishedAt": "2026-10-21T00:56:41Z",
-  "manifestDigest": "a49da9fdf2dabf2408ba2bb14cf6b5c25c35563052cc6307db8f8095caac0b45",
+  "publishedAt": "2026-10-24T16:09:16Z",
+  "manifestDigest": "2dda741fa038ad37e20b9f9750de9acce1d7aa0c8dab246854de69bd8e0ef120",
   "signature": null,
   "keyId": null,
   "models": [
@@ -264,9 +264,9 @@
     {
       "modelId": "funasr-nano-int8",
       "kind": "ASR_LARGE",
-      "displayName": "Fun-ASR-Nano INT8",
+      "displayName": "Fun-ASR-Nano INT8 + native CTC",
       "version": "2025-12-30",
-      "revision": 1,
+      "revision": 2,
       "runtimeId": "sherpa-onnx",
       "runtimeVersionMin": "1.13.8",
       "runtimeVersionMax": null,
@@ -278,14 +278,14 @@
       "capabilities": {
         "supportsStreaming": false,
         "supportsPartial": false,
-        "supportsTokenTiming": false,
+        "supportsTokenTiming": true,
         "supportsLanguageDetection": false,
         "supportsConfidence": false,
         "supportsInverseTextNormalization": true,
         "supportsSecondPass": true,
         "supportsHotwords": true,
         "executionMode": "OFFLINE",
-        "timestampCapability": "NONE",
+        "timestampCapability": "TOKEN",
         "supportsLanguageForcing": true,
         "punctuationMode": "NATIVE",
         "supportedParameters": [
@@ -303,48 +303,66 @@
       "builtinAssetPath": null,
       "download": {
         "packageFormat": "TAR_BZ2",
-        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-funasr-nano-int8-2025-12-30.tar.bz2",
+        "url": "https://github.com/ioannes78/voica-model-channel/releases/download/production-funasr-ctc-r2/voica-funasr-nano-int8-2025-12-30-r2.tar.bz2",
         "mirrors": [],
-        "sizeBytes": 841730611,
-        "sha256": "eb43d7ccc2e86b243f6a03b7df361033dda66db9523d1a92bf6aca2b50c9476b"
+        "sizeBytes": 894636886,
+        "sha256": "de14e7c05aa62f29ca27e56467adb48d3351938eab35b9d76eec87eaee568e7b"
       },
-      "installedSizeBytes": 1010070962,
+      "installedSizeBytes": 1065214619,
       "files": [
         {
           "relativePath": "encoder_adaptor.int8.onnx",
-          "sizeBytes": 238277200,
-          "sha256": "d0246c823f2c34133ae0efee395d8a189c8f92643e3432f866939ee34d34492c",
-          "packagePath": "sherpa-onnx-funasr-nano-int8-2025-12-30/encoder_adaptor.int8.onnx"
+          "sizeBytes": 238277774,
+          "sha256": "d5bb172a133fc4f996ede12cab43c0b9b4bcbb2922c1f967794505b9549b6d85",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/encoder_adaptor.int8.onnx"
         },
         {
           "relativePath": "llm.int8.onnx",
           "sizeBytes": 600339316,
           "sha256": "7f0c5a508b41474b1b1ec1cdbdefafd2cf8b3642c6915a0a425265b7b7d2c960",
-          "packagePath": "sherpa-onnx-funasr-nano-int8-2025-12-30/llm.int8.onnx"
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/llm.int8.onnx"
         },
         {
           "relativePath": "embedding.int8.onnx",
           "sizeBytes": 155583106,
           "sha256": "a05d2816e284fcca29a5dccb2c14b9edeb638fd983a84cd4a447248889b6a408",
-          "packagePath": "sherpa-onnx-funasr-nano-int8-2025-12-30/embedding.int8.onnx"
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/embedding.int8.onnx"
         },
         {
           "relativePath": "Qwen3-0.6B/merges.txt",
           "sizeBytes": 1671853,
           "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
-          "packagePath": "sherpa-onnx-funasr-nano-int8-2025-12-30/Qwen3-0.6B/merges.txt"
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/Qwen3-0.6B/merges.txt"
         },
         {
           "relativePath": "Qwen3-0.6B/tokenizer.json",
           "sizeBytes": 11422654,
           "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
-          "packagePath": "sherpa-onnx-funasr-nano-int8-2025-12-30/Qwen3-0.6B/tokenizer.json"
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/Qwen3-0.6B/tokenizer.json"
         },
         {
           "relativePath": "Qwen3-0.6B/vocab.json",
           "sizeBytes": 2776833,
           "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
-          "packagePath": "sherpa-onnx-funasr-nano-int8-2025-12-30/Qwen3-0.6B/vocab.json"
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/Qwen3-0.6B/vocab.json"
+        },
+        {
+          "relativePath": "ctc_compact.int8.onnx",
+          "sizeBytes": 54235091,
+          "sha256": "db93af357c1d5ba78e9516950fd8931ead11666ffa00b1928e2fda9e8003bc38",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/ctc_compact.int8.onnx"
+        },
+        {
+          "relativePath": "multilingual.tiktoken",
+          "sizeBytes": 907395,
+          "sha256": "747979631e813193436aabcff7c1c235d37de8097b71c563ec8b63b7a515c718",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/multilingual.tiktoken"
+        },
+        {
+          "relativePath": "ctc-alignment.properties",
+          "sizeBytes": 597,
+          "sha256": "90a3cb44bd784d0831a31ab7227538e46941269cffa587ec3c27d774cd681977",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/ctc-alignment.properties"
         }
       ],
       "compatibility": {
@@ -358,10 +376,10 @@
       "license": {
         "id": "Apache-2.0",
         "url": "https://huggingface.co/FunAudioLLM/Fun-ASR-Nano-2512",
-        "attribution": "FunAudioLLM Fun-ASR-Nano-2512; k2-fsa sherpa-onnx INT8 conversion 2025-12-30",
-        "redistributionPolicy": "UPSTREAM_ONLY"
+        "attribution": "FunAudioLLM Fun-ASR-Nano-2512; k2-fsa sherpa-onnx INT8 base; WENZHI revision-2 dual-output encoder + compact native CTC scorer",
+        "redistributionPolicy": "VOICA_MIRROR_ALLOWED"
       },
-      "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-funasr-nano-int8-2025-12-30.tar.bz2",
+      "sourceUrl": "https://www.modelscope.cn/models/FunAudioLLM/Fun-ASR-Nano-2512",
       "homepage": "https://k2-fsa.github.io/sherpa/onnx/funasr-nano/pretrained.html",
       "releaseChannel": "production",
       "autoUpdateEligible": false,
