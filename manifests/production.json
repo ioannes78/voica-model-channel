@@ -1,9 +1,9 @@
 {
   "catalogVersion": 1,
-  "manifestVersion": 7,
+  "manifestVersion": 10,
   "channel": "production",
-  "publishedAt": "2026-10-06T21:11:37Z",
-  "manifestDigest": "8bdb505ce97820cb942bc2855c8a099484b7e22f63ec5567b63f2c1c18d567cf",
+  "publishedAt": "2026-10-24T16:09:16Z",
+  "manifestDigest": "2dda741fa038ad37e20b9f9750de9acce1d7aa0c8dab246854de69bd8e0ef120",
   "signature": null,
   "keyId": null,
   "models": [
@@ -194,6 +194,201 @@
       "criticalUpdate": false
     },
     {
+      "modelId": "fsmn-vad-int8",
+      "kind": "VAD",
+      "displayName": "FSMN VAD INT8",
+      "version": "1.0.0",
+      "revision": 1,
+      "runtimeId": "voica-fsmn-ort",
+      "runtimeVersionMin": "1.0.0",
+      "runtimeVersionMax": null,
+      "languages": [
+        "und"
+      ],
+      "capabilities": {
+        "supportsStreaming": false,
+        "supportsPartial": false,
+        "supportsTokenTiming": false,
+        "supportsLanguageDetection": false,
+        "supportsConfidence": false,
+        "supportsInverseTextNormalization": false,
+        "supportsSecondPass": false,
+        "supportsHotwords": false
+      },
+      "sourceType": "MANAGED_DOWNLOAD",
+      "builtinAssetPath": null,
+      "download": {
+        "packageFormat": "TAR_BZ2",
+        "url": "https://github.com/ioannes78/voica-model-channel/releases/download/candidate-fsmn-vad-r1/fsmn-vad-int8-r1.tar.bz2",
+        "mirrors": [],
+        "sizeBytes": 478102,
+        "sha256": "719be2c2243b11069f6701fb6c478ffd1dc4f342d93753c438a0f13c7e4769e8"
+      },
+      "installedSizeBytes": 516916,
+      "files": [
+        {
+          "relativePath": "model_quant.onnx",
+          "sizeBytes": 508876,
+          "sha256": "9b28837838fce9685503c63139fadbad35d6c8ed485485dafdbb32e725969660",
+          "packagePath": "fsmn-vad-int8-r1/model_quant.onnx"
+        },
+        {
+          "relativePath": "vad.mvn",
+          "sizeBytes": 8040,
+          "sha256": "6820fef9687708c4fc3fab2530179c8fcea6262daa25514380056cd8f6eb1754",
+          "packagePath": "fsmn-vad-int8-r1/vad.mvn"
+        }
+      ],
+      "compatibility": {
+        "abis": [
+          "arm64-v8a"
+        ],
+        "minSdk": 26,
+        "appVersionMin": 92,
+        "appVersionMax": null
+      },
+      "license": {
+        "id": "Apache-2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0",
+        "attribution": "FunASR FSMN-VAD ONNX INT8; upstream revision eeb66f413b94a33458f7edbe7f501b10f20fcc85",
+        "redistributionPolicy": "VOICA_MIRROR_ALLOWED"
+      },
+      "sourceUrl": "https://huggingface.co/funasr/fsmn-vad-onnx/tree/eeb66f413b94a33458f7edbe7f501b10f20fcc85",
+      "homepage": "https://huggingface.co/funasr/fsmn-vad-onnx",
+      "releaseChannel": "production",
+      "autoUpdateEligible": false,
+      "deprecated": false,
+      "criticalUpdate": false,
+      "quantization": "INT8"
+    },
+    {
+      "modelId": "funasr-nano-int8",
+      "kind": "ASR_LARGE",
+      "displayName": "Fun-ASR-Nano INT8 + native CTC",
+      "version": "2025-12-30",
+      "revision": 2,
+      "runtimeId": "sherpa-onnx",
+      "runtimeVersionMin": "1.13.8",
+      "runtimeVersionMax": null,
+      "languages": [
+        "zh",
+        "en",
+        "ja"
+      ],
+      "capabilities": {
+        "supportsStreaming": false,
+        "supportsPartial": false,
+        "supportsTokenTiming": true,
+        "supportsLanguageDetection": false,
+        "supportsConfidence": false,
+        "supportsInverseTextNormalization": true,
+        "supportsSecondPass": true,
+        "supportsHotwords": true,
+        "executionMode": "OFFLINE",
+        "timestampCapability": "TOKEN",
+        "supportsLanguageForcing": true,
+        "punctuationMode": "NATIVE",
+        "supportedParameters": [
+          "numThreads",
+          "maxNewTokens",
+          "temperature",
+          "topP",
+          "seed",
+          "language",
+          "itn",
+          "hotwords"
+        ]
+      },
+      "sourceType": "MANAGED_DOWNLOAD",
+      "builtinAssetPath": null,
+      "download": {
+        "packageFormat": "TAR_BZ2",
+        "url": "https://github.com/ioannes78/voica-model-channel/releases/download/production-funasr-ctc-r2/voica-funasr-nano-int8-2025-12-30-r2.tar.bz2",
+        "mirrors": [],
+        "sizeBytes": 894636886,
+        "sha256": "de14e7c05aa62f29ca27e56467adb48d3351938eab35b9d76eec87eaee568e7b"
+      },
+      "installedSizeBytes": 1065214619,
+      "files": [
+        {
+          "relativePath": "encoder_adaptor.int8.onnx",
+          "sizeBytes": 238277774,
+          "sha256": "d5bb172a133fc4f996ede12cab43c0b9b4bcbb2922c1f967794505b9549b6d85",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/encoder_adaptor.int8.onnx"
+        },
+        {
+          "relativePath": "llm.int8.onnx",
+          "sizeBytes": 600339316,
+          "sha256": "7f0c5a508b41474b1b1ec1cdbdefafd2cf8b3642c6915a0a425265b7b7d2c960",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/llm.int8.onnx"
+        },
+        {
+          "relativePath": "embedding.int8.onnx",
+          "sizeBytes": 155583106,
+          "sha256": "a05d2816e284fcca29a5dccb2c14b9edeb638fd983a84cd4a447248889b6a408",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/embedding.int8.onnx"
+        },
+        {
+          "relativePath": "Qwen3-0.6B/merges.txt",
+          "sizeBytes": 1671853,
+          "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/Qwen3-0.6B/merges.txt"
+        },
+        {
+          "relativePath": "Qwen3-0.6B/tokenizer.json",
+          "sizeBytes": 11422654,
+          "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/Qwen3-0.6B/tokenizer.json"
+        },
+        {
+          "relativePath": "Qwen3-0.6B/vocab.json",
+          "sizeBytes": 2776833,
+          "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/Qwen3-0.6B/vocab.json"
+        },
+        {
+          "relativePath": "ctc_compact.int8.onnx",
+          "sizeBytes": 54235091,
+          "sha256": "db93af357c1d5ba78e9516950fd8931ead11666ffa00b1928e2fda9e8003bc38",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/ctc_compact.int8.onnx"
+        },
+        {
+          "relativePath": "multilingual.tiktoken",
+          "sizeBytes": 907395,
+          "sha256": "747979631e813193436aabcff7c1c235d37de8097b71c563ec8b63b7a515c718",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/multilingual.tiktoken"
+        },
+        {
+          "relativePath": "ctc-alignment.properties",
+          "sizeBytes": 597,
+          "sha256": "90a3cb44bd784d0831a31ab7227538e46941269cffa587ec3c27d774cd681977",
+          "packagePath": "voica-funasr-nano-int8-2025-12-30-r2/ctc-alignment.properties"
+        }
+      ],
+      "compatibility": {
+        "abis": [
+          "arm64-v8a"
+        ],
+        "minSdk": 26,
+        "appVersionMin": 92,
+        "appVersionMax": null
+      },
+      "license": {
+        "id": "Apache-2.0",
+        "url": "https://huggingface.co/FunAudioLLM/Fun-ASR-Nano-2512",
+        "attribution": "FunAudioLLM Fun-ASR-Nano-2512; k2-fsa sherpa-onnx INT8 base; WENZHI revision-2 dual-output encoder + compact native CTC scorer",
+        "redistributionPolicy": "VOICA_MIRROR_ALLOWED"
+      },
+      "sourceUrl": "https://www.modelscope.cn/models/FunAudioLLM/Fun-ASR-Nano-2512",
+      "homepage": "https://k2-fsa.github.io/sherpa/onnx/funasr-nano/pretrained.html",
+      "releaseChannel": "production",
+      "autoUpdateEligible": false,
+      "deprecated": false,
+      "criticalUpdate": false,
+      "runtimeModelType": "funasr-nano",
+      "quantization": "INT8"
+    },
+    {
       "modelId": "pyannote-segmentation-3-int8",
       "kind": "SPEAKER",
       "speakerRole": "DIARIZATION_SEGMENTATION",
@@ -254,112 +449,6 @@
       "autoUpdateEligible": false,
       "deprecated": false,
       "criticalUpdate": false
-    },
-    {
-      "modelId": "qwen3-asr-0.6b-int8",
-      "kind": "ASR_LARGE",
-      "displayName": "Qwen3-ASR 0.6B INT8",
-      "version": "2026-03-25",
-      "revision": 1,
-      "runtimeId": "sherpa-onnx",
-      "runtimeVersionMin": "1.13.8",
-      "runtimeVersionMax": null,
-      "languages": [
-        "multilingual"
-      ],
-      "capabilities": {
-        "supportsStreaming": false,
-        "supportsPartial": false,
-        "supportsTokenTiming": false,
-        "supportsLanguageDetection": false,
-        "supportsConfidence": false,
-        "supportsInverseTextNormalization": false,
-        "supportsSecondPass": true,
-        "supportsHotwords": true,
-        "executionMode": "OFFLINE",
-        "timestampCapability": "NONE",
-        "supportsLanguageForcing": false,
-        "punctuationMode": "NATIVE",
-        "supportedParameters": [
-          "numThreads",
-          "maxTotalLen",
-          "maxNewTokens",
-          "temperature",
-          "topP",
-          "seed",
-          "hotwords"
-        ]
-      },
-      "sourceType": "MANAGED_DOWNLOAD",
-      "builtinAssetPath": null,
-      "download": {
-        "packageFormat": "TAR_BZ2",
-        "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25.tar.bz2",
-        "mirrors": [],
-        "sizeBytes": 878702423,
-        "sha256": "393f8a14e2f5fb96746aaab342997a40641001fbd5bf9592a080a8329178ee96"
-      },
-      "installedSizeBytes": 987015347,
-      "files": [
-        {
-          "relativePath": "conv_frontend.onnx",
-          "sizeBytes": 44148281,
-          "sha256": "d22dc4423e0940e49884e903d2ea2f7e5567c14fc1aed97e4e26d6b8f208ef9e",
-          "packagePath": "sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25/conv_frontend.onnx"
-        },
-        {
-          "relativePath": "encoder.int8.onnx",
-          "sizeBytes": 182491662,
-          "sha256": "60748d3e6744a57c9c91e1b17424a6c2990567e8adceb0783940c03ed98fa9d9",
-          "packagePath": "sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25/encoder.int8.onnx"
-        },
-        {
-          "relativePath": "decoder.int8.onnx",
-          "sizeBytes": 755914231,
-          "sha256": "4f6885be5959ae26af3089d38ee7972c5fafbeeb1cf8d5e76eab6d8b61ca5771",
-          "packagePath": "sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25/decoder.int8.onnx"
-        },
-        {
-          "relativePath": "tokenizer/merges.txt",
-          "sizeBytes": 1671853,
-          "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5",
-          "packagePath": "sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25/tokenizer/merges.txt"
-        },
-        {
-          "relativePath": "tokenizer/tokenizer_config.json",
-          "sizeBytes": 12487,
-          "sha256": "4942d005604266809309cabc9f4e9cb89ce855d59b14681fdc0e1cc62ea26c4c",
-          "packagePath": "sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25/tokenizer/tokenizer_config.json"
-        },
-        {
-          "relativePath": "tokenizer/vocab.json",
-          "sizeBytes": 2776833,
-          "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
-          "packagePath": "sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25/tokenizer/vocab.json"
-        }
-      ],
-      "compatibility": {
-        "abis": [
-          "arm64-v8a"
-        ],
-        "minSdk": 26,
-        "appVersionMin": 41,
-        "appVersionMax": null
-      },
-      "license": {
-        "id": "Apache-2.0",
-        "url": "https://github.com/QwenLM/Qwen3-ASR/blob/main/LICENSE",
-        "attribution": "Qwen3-ASR 0.6B INT8 2026-03-25; sherpa-onnx export",
-        "redistributionPolicy": "UPSTREAM_ONLY"
-      },
-      "sourceUrl": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-qwen3-asr-0.6B-int8-2026-03-25.tar.bz2",
-      "homepage": "https://github.com/QwenLM/Qwen3-ASR",
-      "releaseChannel": "production",
-      "autoUpdateEligible": false,
-      "deprecated": false,
-      "criticalUpdate": false,
-      "runtimeModelType": "qwen3-asr",
-      "quantization": "INT8"
     },
     {
       "modelId": "sensevoice-2024-int8",

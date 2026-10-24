@@ -1,0 +1,151 @@
+name: Promote FunASR CTC Revision 2 Production
+
+on:
+  push:
+    branches: [ stage16b-vad-production-promotion ]
+    paths:
+      - ".github/workflows/promote-funasr-ctc-r2-production.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: promote-funasr-ctc-r2-production
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      CANDIDATE_TAG: candidate-stage16b-funasr-ctc-p5-r1
+      PRODUCTION_TAG: production-funasr-ctc-r2
+      PACKAGE_NAME: voica-funasr-nano-int8-2025-12-30-r2.tar.bz2
+      CANDIDATE_PACKAGE_SIZE: "894636886"
+      CANDIDATE_PACKAGE_SHA256: de14e7c05aa62f29ca27e56467adb48d3351938eab35b9d76eec87eaee568e7b
+      CANDIDATE_DESCRIPTOR_SHA256: c8742baca217c355225a2cd77f789e46c58ddb39edb1ccdb04fd6862233ddab3
+      CANDIDATE_METADATA_SHA256: 94deda741134391fc206b2d3361de4572bc1b44f225212582fcbb8cef1883d67
+      CANDIDATE_MANIFEST_SHA256: 017a0e972cd285b423c61d67ad2a86adaa3524f10af5596b331b173d3027c48f
+
+    steps:
+      - name: Checkout promotion branch
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Download immutable accepted P5 assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          gh release download "$CANDIDATE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --dir dist \
+            --pattern "$PACKAGE_NAME" \
+            --pattern model-descriptor.json \
+            --pattern package-metadata.json \
+            --pattern production.json
+          test "$(stat -c %s "dist/$PACKAGE_NAME")" = "$CANDIDATE_PACKAGE_SIZE"
+          echo "$CANDIDATE_PACKAGE_SHA256  dist/$PACKAGE_NAME" | sha256sum -c -
+          echo "$CANDIDATE_DESCRIPTOR_SHA256  dist/model-descriptor.json" | sha256sum -c -
+          echo "$CANDIDATE_METADATA_SHA256  dist/package-metadata.json" | sha256sum -c -
+          echo "$CANDIDATE_MANIFEST_SHA256  dist/production.json" | sha256sum -c -
+
+      - name: Normalize accepted candidate as production revision 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import datetime
+          import hashlib
+          import json
+          from pathlib import Path
+
+          dist = Path('dist')
+          manifest_path = dist / 'production.json'
+          descriptor_path = dist / 'model-descriptor.json'
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          descriptor = json.loads(descriptor_path.read_text(encoding='utf-8'))
+
+          assert manifest['manifestVersion'] == 10
+          assert descriptor['modelId'] == 'funasr-nano-int8'
+          assert descriptor['revision'] == 2
+          assert descriptor['capabilities']['supportsTokenTiming'] is True
+          assert descriptor['capabilities']['timestampCapability'] == 'TOKEN'
+          files = {x['relativePath']: x for x in descriptor['files']}
+          assert files['encoder_adaptor.int8.onnx']['sizeBytes'] == 238277774
+          assert files['encoder_adaptor.int8.onnx']['sha256'] == 'd5bb172a133fc4f996ede12cab43c0b9b4bcbb2922c1f967794505b9549b6d85'
+          assert files['ctc_compact.int8.onnx']['sizeBytes'] == 54235091
+          assert files['ctc_compact.int8.onnx']['sha256'] == 'db93af357c1d5ba78e9516950fd8931ead11666ffa00b1928e2fda9e8003bc38'
+          assert files['multilingual.tiktoken']['sha256'] == '747979631e813193436aabcff7c1c235d37de8097b71c563ec8b63b7a515c718'
+          assert 'ctc-alignment.properties' in files
+
+          descriptor['displayName'] = 'Fun-ASR-Nano INT8 + native CTC'
+          descriptor['releaseChannel'] = 'production'
+          descriptor['download']['url'] = (
+              'https://github.com/ioannes78/voica-model-channel/releases/download/'
+              'production-funasr-ctc-r2/' + descriptor['download']['url'].rsplit('/', 1)[-1]
+          )
+          descriptor['license']['attribution'] = (
+              'FunAudioLLM Fun-ASR-Nano-2512; k2-fsa sherpa-onnx INT8 base; '
+              'WENZHI revision-2 dual-output encoder + compact native CTC scorer'
+          )
+          descriptor['autoUpdateEligible'] = False
+          descriptor['deprecated'] = False
+          descriptor['criticalUpdate'] = False
+
+          matches = [i for i, m in enumerate(manifest['models']) if m.get('modelId') == 'funasr-nano-int8']
+          assert len(matches) == 1
+          manifest['models'][matches[0]] = descriptor
+          manifest['channel'] = 'production'
+          manifest['publishedAt'] = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+          manifest['manifestDigest'] = hashlib.sha256(
+              json.dumps(manifest['models'], ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+          ).hexdigest()
+
+          descriptor_path.write_text(json.dumps(descriptor, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          print('production manifest digest:', manifest['manifestDigest'])
+          PY
+          python3 scripts/validate_manifest.py dist/production.json
+
+      - name: Publish immutable production model assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          assets=(
+            "dist/$PACKAGE_NAME"
+            dist/model-descriptor.json
+            dist/package-metadata.json
+            dist/production.json
+          )
+          if gh release view "$PRODUCTION_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$PRODUCTION_TAG" "${assets[@]}" --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$PRODUCTION_TAG" "${assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "Production: FunASR Nano revision 2 native CTC" \
+              --notes "Promoted after Stage 16B P5 real-device acceptance. Revision 2 is the WENZHI production FunASR package with trusted native CTC token timing."
+          fi
+
+      - name: Commit production manifest v10
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp dist/production.json manifests/production.json
+          python3 scripts/validate_manifest.py manifests/production.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifests/production.json
+          if git diff --cached --quiet; then
+            echo "Production manifest already promoted"
+            exit 0
+          fi
+          git commit -m "feat(stage16b): promote FunASR native CTC revision 2"
+          git push origin HEAD:stage16b-vad-production-promotion
