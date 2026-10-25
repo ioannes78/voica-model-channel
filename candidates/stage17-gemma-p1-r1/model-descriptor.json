@@ -1,0 +1,62 @@
+{
+  "modelId": "gemma-4-e2b-it-litertlm",
+  "kind": "LOCAL_LLM",
+  "displayName": "Gemma 4 E2B",
+  "version": "7fa1d78473894f7e736a21d920c3aa80f950c0db",
+  "revision": 1,
+  "runtimeId": "litert-lm",
+  "runtimeVersionMin": "0.18.0",
+  "runtimeVersionMax": "0.18.0",
+  "languages": [
+    "und"
+  ],
+  "capabilities": {
+    "supportsStreaming": false,
+    "supportsPartial": false,
+    "supportsTokenTiming": false,
+    "supportsLanguageDetection": false,
+    "supportsConfidence": false,
+    "supportsInverseTextNormalization": false,
+    "supportsSecondPass": false,
+    "supportsHotwords": false
+  },
+  "sourceType": "MANAGED_DOWNLOAD",
+  "builtinAssetPath": null,
+  "download": {
+    "packageFormat": "SINGLE_FILE",
+    "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/7fa1d78473894f7e736a21d920c3aa80f950c0db/gemma-4-E2B-it.litertlm?download=true",
+    "mirrors": [],
+    "sizeBytes": 2583085056,
+    "sha256": "ab7838cdfc8f77e54d8ca45eadceb20452d9f01e4bfade03e5dce27911b27e42"
+  },
+  "installedSizeBytes": 2583085056,
+  "files": [
+    {
+      "relativePath": "gemma-4-E2B-it.litertlm",
+      "sizeBytes": 2583085056,
+      "sha256": "ab7838cdfc8f77e54d8ca45eadceb20452d9f01e4bfade03e5dce27911b27e42",
+      "packagePath": "gemma-4-E2B-it.litertlm"
+    }
+  ],
+  "compatibility": {
+    "abis": [
+      "arm64-v8a"
+    ],
+    "minSdk": 26,
+    "appVersionMin": 92,
+    "appVersionMax": null
+  },
+  "license": {
+    "id": "Apache-2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "attribution": "LiteRT Community Gemma 4 E2B IT; pinned upstream revision 7fa1d78473894f7e736a21d920c3aa80f950c0db",
+    "redistributionPolicy": "UPSTREAM_ONLY"
+  },
+  "sourceUrl": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/tree/7fa1d78473894f7e736a21d920c3aa80f950c0db",
+  "homepage": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm",
+  "releaseChannel": "candidate",
+  "autoUpdateEligible": false,
+  "deprecated": false,
+  "criticalUpdate": false,
+  "runtimeModelType": "gemma-4-e2b-it-litertlm"
+}

@@ -1,0 +1,68 @@
+name: Stage 17 Gemma P1 Candidate
+
+on:
+  push:
+    branches:
+      - candidate/stage17-gemma-p1-r1
+    paths:
+      - candidates/stage17-gemma-p1-r1/**
+      - .github/workflows/stage17-gemma-candidate.yml
+
+permissions:
+  contents: write
+
+jobs:
+  publish-candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate and validate candidate manifest
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          python3 scripts/upsert_model.py \
+            manifests/production.json \
+            candidates/stage17-gemma-p1-r1/model-descriptor.json \
+            dist/production.json
+          python3 scripts/validate_manifest.py dist/production.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d = json.loads(Path('candidates/stage17-gemma-p1-r1/model-descriptor.json').read_text())
+          assert d['version'] == '7fa1d78473894f7e736a21d920c3aa80f950c0db'
+          assert d['download']['sizeBytes'] == 2583085056
+          assert d['download']['sha256'] == 'ab7838cdfc8f77e54d8ca45eadceb20452d9f01e4bfade03e5dce27911b27e42'
+          assert d['runtimeId'] == 'litert-lm'
+          assert d['runtimeVersionMin'] == '0.18.0'
+          assert d['runtimeVersionMax'] == '0.18.0'
+          PY
+
+      - name: Publish prerelease candidate manifest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="candidate-stage17-gemma-p1-r1"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" \
+              candidates/stage17-gemma-p1-r1/model-descriptor.json \
+              dist/production.json \
+              --clobber
+          else
+            gh release create "$tag" \
+              candidates/stage17-gemma-p1-r1/model-descriptor.json \
+              dist/production.json \
+              --target "$GITHUB_SHA" \
+              --prerelease \
+              --title "Stage 17 Gemma P1 candidate r1" \
+              --notes "Stage 17 P1 QA candidate only. Adds the P0-validated pre-MTP Gemma 4 E2B artifact to a manifest derived from the current production model matrix. Do not merge this candidate branch into the production channel without separate approval."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stage17-gemma-p1-candidate-r1
+          path: |
+            candidates/stage17-gemma-p1-r1/model-descriptor.json
+            dist/production.json
+          retention-days: 1
