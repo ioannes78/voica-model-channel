@@ -58,5 +58,6 @@
   "autoUpdateEligible": false,
   "deprecated": false,
   "criticalUpdate": false,
+  "estimatedPeakRamBytes": 1404609536,
   "runtimeModelType": "gemma-4-e2b-it-litertlm"
 }

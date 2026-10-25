@@ -36,6 +36,7 @@ jobs:
           assert d['runtimeId'] == 'litert-lm'
           assert d['runtimeVersionMin'] == '0.18.0'
           assert d['runtimeVersionMax'] == '0.18.0'
+          assert d['estimatedPeakRamBytes'] == 1404609536
           PY
 
       - name: Publish prerelease candidate manifest
